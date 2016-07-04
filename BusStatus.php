@@ -1,0 +1,352 @@
+<?php
+session_start();
+?>
+<!DOCTYPE html>
+<html>
+   
+    
+<title> Buses </title>
+<div class="col-lg-1"></div>
+<div class="col-lg-2"></div>
+<head>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    
+    
+    
+    
+</head>
+<link rel="stylesheet" href="style1.css">
+ 
+<div class="col-lg-6" >
+       
+            <body>
+                
+                
+                
+                
+                
+                
+          
+                
+                
+                
+      <div style="margin-top: 100px">          
+
+<table class="table table-striped">
+<tr><th>License Plate </th>
+      <th>Bus No </th>
+      <th>Bus Line </th>
+      <th>Bus Yard Name  </th>
+      <th>Status  </th>
+      <th>View Report  </th>
+      <th>Show Map  </th>
+      </tr>
+     
+
+<?php
+require ('config.php');
+
+$sqlStatus1 = ("UPDATE bus SET BusStatus = 'Working' " );
+$resultS1 = mysql_query($sqlStatus1);
+
+$timeNow = date("Y-m-d");
+//echo $timeNow ."<br>";
+
+$sqlT = ("SELECT TireLastChangeDate, LastMaintenanceDate FROM Bus ");
+$resultT = mysql_query($sqlT);
+$counter=1;
+if($resultT ==null)
+{//echo "There is No buses in your fleet";
+}
+else{
+while($row = mysql_fetch_array($resultT, MYSQL_ASSOC)) 
+{ 
+$datetime1 = new DateTime($row['TireLastChangeDate']);
+$datetime2 = new DateTime($timeNow );
+$datetime3 = new DateTime($row['LastMaintenanceDate']);
+$interval = $datetime1->diff($datetime2);
+$interval2 = $datetime3->diff($datetime2);
+
+if ($interval->format('%R%a days') >=  90 || $interval2->format('%R%a days') >=  90)
+{
+$ok= '0';
+//echo "ok : ".$ok ."<br>";
+}
+else
+{
+$ok = 'Working';
+//echo "ok : ".$ok ."<br>";
+}
+
+$sqlStatus1 = ("UPDATE bus SET BusStatus =$ok WHERE ID=$counter" );
+$resultS1 = mysql_query($sqlStatus1);
+//echo "hi";
+$sqlStatus = ("UPDATE bus SET BusStatus =	'Not Working Correctly' WHERE  (  (FuelLevel < 0.33*FuelCapacity) || (BusStatus = '0') ) " );//(Speed > SpeedLimit)  ||
+$resultS = mysql_query($sqlStatus);
+//echo "hi";
+$counter=$counter+1;
+}
+}
+$counter=1;
+
+$sql = ("SELECT LicensePlate,BusStatus,BusType,DeviceUniqueId,SimPhoneNo FROM Bus ");
+$result = mysql_query($sql);
+
+if($result ==null)
+{echo '<strong>There is No buses in your fleet</strong>';}
+else{
+while($row = mysql_fetch_array($result, MYSQL_ASSOC)) 
+{ 
+$sqllink= ("SELECT * From Bus WHERE ID=$counter");
+$resultlink = mysql_query($sqllink);
+//$LP=$row['LicensePlate'] ;
+//echo $LP;
+print "<tr>"; 
+print "<td>" . $LP=$row['LicensePlate'] . "</td>"; 
+print "<td>" . $row['BusType'] . "</td>"; 
+print "<td>" . $row['DeviceUniqueId'] . "</td>"; 
+print "<td>" . $row['SimPhoneNo'] . "</td>";
+print "<td>" . $row['BusStatus'] . "</td>"; 
+print "<td> <a href =reports.php?ID=$counter&LicensePlate=$LP  View Report </a></td>";
+print "<td> <a href = 'map.php' > Show Map </a></td> "; //to make it open in new window (target=_blank) //?id=$counter &LicensePlate=$LP
+print "</tr>"; 
+
+//$_SESSION["ID"] = $counter;
+//$_SESSION["LPL"] = $LP;
+$counter=$counter+1;
+} 
+}
+ 
+?>
+</table>
+          </div>
+ 
+</div>
+
+ <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+</html>
+
+
+<html>
+    
+    <head>
+        
+        <style>.nav-side-menu {
+  overflow: auto;
+  font-family: verdana;
+  font-size: 12px;
+  font-weight: 200;
+  background-color: #2e353d;
+  position: fixed;
+  top: 0px;
+  width: 300px;
+  height: 100%;
+  color: #e1ffff;
+}
+.nav-side-menu .brand {
+  background-color: #23282e;
+  line-height: 50px;
+  display: block;
+  text-align: center;
+  font-size: 14px;
+}
+.nav-side-menu .toggle-btn {
+  display: none;
+}
+.nav-side-menu ul,
+.nav-side-menu li {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  line-height: 35px;
+  cursor: pointer;
+  /*    
+    .collapsed{
+       .arrow:before{
+                 font-family: FontAwesome;
+                 content: "\f053";
+                 display: inline-block;
+                 padding-left:10px;
+                 padding-right: 10px;
+                 vertical-align: middle;
+                 float:right;
+            }
+     }
+*/
+}
+.nav-side-menu ul :not(collapsed) .arrow:before,
+.nav-side-menu li :not(collapsed) .arrow:before {
+  font-family: FontAwesome;
+  content: "\f078";
+  display: inline-block;
+  padding-left: 10px;
+  padding-right: 10px;
+  vertical-align: middle;
+  float: right;
+}
+.nav-side-menu ul .active,
+.nav-side-menu li .active {
+  border-left: 3px solid #d19b3d;
+  background-color: #4f5b69;
+}
+.nav-side-menu ul .sub-menu li.active,
+.nav-side-menu li .sub-menu li.active {
+  color: #d19b3d;
+}
+.nav-side-menu ul .sub-menu li.active a,
+.nav-side-menu li .sub-menu li.active a {
+  color: #d19b3d;
+}
+.nav-side-menu ul .sub-menu li,
+.nav-side-menu li .sub-menu li {
+  background-color: #181c20;
+  border: none;
+  line-height: 28px;
+  border-bottom: 1px solid #23282e;
+  margin-left: 0px;
+}
+.nav-side-menu ul .sub-menu li:hover,
+.nav-side-menu li .sub-menu li:hover {
+  background-color: #020203;
+}
+.nav-side-menu ul .sub-menu li:before,
+.nav-side-menu li .sub-menu li:before {
+  font-family: FontAwesome;
+  content: "\f105";
+  display: inline-block;
+  padding-left: 10px;
+  padding-right: 10px;
+  vertical-align: middle;
+}
+.nav-side-menu li {
+  padding-left: 0px;
+  border-left: 3px solid #2e353d;
+  border-bottom: 1px solid #23282e;
+}
+.nav-side-menu li a {
+  text-decoration: none;
+  color: #e1ffff;
+}
+.nav-side-menu li a i {
+  padding-left: 10px;
+  width: 20px;
+  padding-right: 20px;
+}
+.nav-side-menu li:hover {
+  border-left: 3px solid #d19b3d;
+  background-color: #4f5b69;
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  -ms-transition: all 1s ease;
+  transition: all 1s ease;
+}
+@media (max-width: 767px) {
+  .nav-side-menu {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .nav-side-menu .toggle-btn {
+    display: block;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 10 !important;
+    padding: 3px;
+    background-color: #ffffff;
+    color: #000;
+    width: 40px;
+    text-align: center;
+  }
+  .brand {
+    text-align: left !important;
+    font-size: 22px;
+    padding-left: 20px;
+    line-height: 50px !important;
+  }
+}
+@media (min-width: 767px) {
+  .nav-side-menu .menu-list .menu-content {
+    display: block;
+  }
+}
+body {
+  margin: 0px;
+  padding: 0px;
+}
+</style>
+        
+        
+    </head>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+<div class="nav-side-menu">
+    <div class="brand"><b>Tracking system </div>
+    <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
+  
+        <div class="menu-list">
+  
+            <ul id="menu-content" class="menu-content collapse out">
+                <li>
+                  <a href="homepage.php">
+                  <i class="fa fa-dashboard fa-lg"></i> Home
+                  </a>
+                </li>
+
+                <li>
+                     <a href="personal.php">
+                  <i class="fa fa-user fa-lg"></i> Profile
+                  </a>
+                  </li>
+
+
+               
+
+
+                <li data-toggle="collapse" data-target="#new" class="collapsed">
+                  <i class="fa fa-car fa-lg"></i> My Busses <span class="arrow"></span></a>
+                </li>
+                <ul class="sub-menu collapse" id="new">
+                 <a href="ownerhomeupdate.php"> <li>ADD/Remove bus</li>
+                 <a href="busstatus.php"> <li>Bus status and reports </li>
+                
+                </ul>
+
+
+                 
+
+                 <li>
+                     <a href="ownerhome21.php ">
+                  <i class="fa fa-users fa-lg"></i> Managers
+                  </a>
+                </li>
+                 <li>
+                  <a href="ownerhome31.php">
+                  <i class="glyphicon glyphicon-search"></i> search Busses
+                  </a>
+                  </li>
+            </ul>
+     </div>
+</div
+</html>
