@@ -1,3 +1,6 @@
+<?php    
+header('Location: BusStatus.php');    
+?>
 <?php
 session_start();
 ?>
@@ -48,16 +51,8 @@ session_start();
 
 <table class="table table-striped">
 <tr>
-      <th>Device Unique Id</th>
-      <th>Device name</th>
-      <th>Speed</th>
-      <th>License Plate </th>
-      <th>Bus Type</th>
-      <th>Device Unique Id </th>
-      <th>Sim Phone Number </th>
-      <th>Status  </th>
-      <th>View Report  </th>
-      <th>Show Map  </th>
+      <th>status</th>
+      
       </tr>
      
 
@@ -71,8 +66,11 @@ if ($db1->connect_error) {
 if ($db2->connect_error) {
     die("Connection failed: " . $db2->connect_error);
 } 
-//require ("conditions.php");
+$sqlStatus1 = ("UPDATE bus SET BusStatus = 'Working' " );
+$resultS1 = $db1->query($sqlStatus1);
+
 $counter=1;
+
 $sql = ("SELECT DISTINCT LicensePlate,DeviceUniqueId FROM bus ");
 $result = $db1->query($sql);
 
@@ -101,30 +99,82 @@ $L=$row['DeviceUniqueId'] ;
 else{
 
   while($row = $resultjoin->fetch_assoc()) 
-  {
-//$Did=$row['DeviceUniqueId'] ;
+  {$timeNow = date("Y-m-d");
+//echo $timeNow ."<br>";
+//$counter=1;
+ 
+$datetime1 = new DateTime($row['TireLastChangeDate']);
+$datetime2 = new DateTime($timeNow );
+$datetime3 = new DateTime($row['LastMaintenanceDate']);
+$interval = $datetime1->diff($datetime2);
+$interval2 = $datetime3->diff($datetime2);
+
+if ($interval->format('%R%a days') >=  90 || $interval2->format('%R%a days') >=  90)
+{
+$ok= '0';
+//echo "ok : ".$ok ."<br>";
+}
+else
+{
+$ok = 'Working';
+//echo "ok : ".$ok ."<br>";
+}
+
+$sqlStatus1 = ("UPDATE bus SET BusStatus =$ok WHERE ID=$counter" );
+$resultS1 =$db1->query($sqlStatus1);
+$sqlStatus = ("UPDATE bus SET BusStatus =	'Not Working Correctly' WHERE  BusStatus = '0' " );//($Speed > $SpeedLimit)  ||(FuelLevel < 0.33*FuelCapacity) ||
+$resultS = $db1->query($sqlStatus);
+
 $SpeedLimit=$row['SpeedLimit'];
 $Speed=$row['speed'];
-$sqllink= ("SELECT * From bus WHERE ID=$counter");
-$resultlink = $db1->query($sqllink);
-  print "<tr>"; 
-print "<td>" .$row['DeviceUniqueId'] . "</td>"; 
-print "<td>" .$row['name'] . "</td>"; 
-print "<td>" .$row['speed'] . "</td>";
-print "<td>" . $LP=$row['LicensePlate'] . "</td>"; 
-print "<td>" . $row['BusType'] . "</td>"; 
-print "<td>" . $row['DeviceUniqueId'] . "</td>"; 
-print "<td>" . $row['SimPhoneNo'] . "</td>";
-print "<td>" . $row['BusStatus'] . "</td>"; 
-print "<td> <a href =reports.php?ID=$counter&LicensePlate=$LP  View Report </a></td>";
-print "<td> <a href = 'map.php' > Show Map </a></td> "; //to make it open in new window (target=_blank) //?id=$counter &LicensePlate=$LP
-print "</tr>"; 
+$fuelcap=$row['FuelCapacity'];
+$attr =$row['attributes'];
+//fuel
+$fuel1 =strchr($attr,"adc1");
+$fuel2 =strchr($fuel1,",",1);
+$fuel =strchr($fuel2,":",0);
+$fuel =ltrim($fuel,':');
+$fuellevel= ((1024-$fuel)/1024)*100;
+//oil
+
+$oil1 =strchr($attr,"adc2");
+//echo $fuel1;
+$oil2 =strchr($oil1,",",1);
+$oil =strchr($oil2,":",0);
+$oil =ltrim($oil,':');
+$oillevel= ((1024-$oil)/1024)*100;
+//echo "level :".$fuellevel ;
+$sqlStatus = ("UPDATE bus SET FuelLevel =	$fuel where ID =$counter");//($Speed > $SpeedLimit)  ||
+$resultS = $db1->query($sqlStatus);
+
+if($Speed > $SpeedLimit)
+{
+//echo "c :".$counter ."bs";
+$sqlStatus1 = ("UPDATE bus SET BusStatus = 'Not Working Correctly' WHERE ID =$counter" );
+$resultS1 =$db1->query($sqlStatus1);
+}
+
+if($fuellevel < 40)
+{
+//echo "c :".$counter ."bs";
+$sqlStatus2 = ("UPDATE bus SET BusStatus = 'Not Working Correctly' WHERE ID =$counter" );
+$resultS2=$db1->query($sqlStatus2);
+}
+
+if($oillevel < 40)
+{
+//echo "c :".$counter ."bs";
+$sqlStatus2 = ("UPDATE bus SET BusStatus = 'Not Working Correctly' WHERE ID =$counter" );
+$resultS2=$db1->query($sqlStatus2);
+}
+ print "<tr>"; 
+
+//print "<td>" . $row['attributes'] . "</td></tr>"; 
 
 }
 
 $counter=$counter+1;
 }}}
-
  
 ?>
 </table>
