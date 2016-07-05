@@ -42,7 +42,6 @@ print "<tr><th>Maximum Number of Buses</th><td>" . $row['MaxNoOfBuses'] . "</td>
 print "<tr><th>Account Price</th><td>" . $row['AccPrice'] . "</td></tr>";
 } 
 print "</table>"; 
-
 ?>
     
 </div>
