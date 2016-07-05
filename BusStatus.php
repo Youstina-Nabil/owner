@@ -47,10 +47,14 @@ session_start();
       <div style="margin-top: 100px">          
 
 <table class="table table-striped">
-<tr><th>License Plate </th>
-      <th>Bus No </th>
-      <th>Bus Line </th>
-      <th>Bus Yard Name  </th>
+<tr>
+      <th>Device Unique Id</th>
+      <th>Device name</th>
+      <th>Speed</th>
+      <th>License Plate </th>
+      <th>Bus Type</th>
+      <th>Device Unique Id </th>
+      <th>Sim Phone Number </th>
       <th>Status  </th>
       <th>View Report  </th>
       <th>Show Map  </th>
@@ -58,22 +62,30 @@ session_start();
      
 
 <?php
-require ('config.php');
 
+  $db1 = new mysqli('localhost','root','','customer_side_db');
+  $db2 = new mysqli('localhost','root','','device_database');
+if ($db1->connect_error) {
+    die("Connection failed: " . $db1->connect_error);
+} 
+if ($db2->connect_error) {
+    die("Connection failed: " . $db2->connect_error);
+} 
 $sqlStatus1 = ("UPDATE bus SET BusStatus = 'Working' " );
-$resultS1 = mysql_query($sqlStatus1);
+$resultS1 = $db1->query($sqlStatus1);
+
+
 
 $timeNow = date("Y-m-d");
 //echo $timeNow ."<br>";
-
-$sqlT = ("SELECT TireLastChangeDate, LastMaintenanceDate FROM Bus ");
-$resultT = mysql_query($sqlT);
 $counter=1;
+$sqlT = ("SELECT TireLastChangeDate, LastMaintenanceDate FROM Bus ");
+$resultT = $db1->query($sqlT);
 if($resultT ==null)
 {//echo "There is No buses in your fleet";
 }
 else{
-while($row = mysql_fetch_array($resultT, MYSQL_ASSOC)) 
+while($row = $resultT->fetch_assoc()) 
 { 
 $datetime1 = new DateTime($row['TireLastChangeDate']);
 $datetime2 = new DateTime($timeNow );
@@ -93,29 +105,53 @@ $ok = 'Working';
 }
 
 $sqlStatus1 = ("UPDATE bus SET BusStatus =$ok WHERE ID=$counter" );
-$resultS1 = mysql_query($sqlStatus1);
+$resultS1 =$db1->query($sqlStatus1);
 //echo "hi";
-$sqlStatus = ("UPDATE bus SET BusStatus =	'Not Working Correctly' WHERE  (  (FuelLevel < 0.33*FuelCapacity) || (BusStatus = '0') ) " );//(Speed > SpeedLimit)  ||
-$resultS = mysql_query($sqlStatus);
+$sqlStatus = ("UPDATE bus SET BusStatus =	'Not Working Correctly' WHERE  (   (FuelLevel < 0.33*FuelCapacity) || (BusStatus = '0') ) " );//($Speed > $SpeedLimit)  ||
+$resultS = $db1->query($sqlStatus);
 //echo "hi";
 $counter=$counter+1;
 }
-}
-$counter=1;
 
-$sql = ("SELECT LicensePlate,BusStatus,BusType,DeviceUniqueId,SimPhoneNo FROM Bus ");
-$result = mysql_query($sql);
+$counter=1;
+$sql = ("SELECT DISTINCT LicensePlate,DeviceUniqueId FROM Bus ");
+$result = $db1->query($sql);
 
 if($result ==null)
 {echo '<strong>There is No buses in your fleet</strong>';}
 else{
-while($row = mysql_fetch_array($result, MYSQL_ASSOC)) 
+while($row = $result->fetch_assoc()) 
 { 
-$sqllink= ("SELECT * From Bus WHERE ID=$counter");
-$resultlink = mysql_query($sqllink);
-//$LP=$row['LicensePlate'] ;
+$LP=$row['LicensePlate'] ;
 //echo $LP;
-print "<tr>"; 
+$L=$row['DeviceUniqueId'] ;
+//echo $Speed;
+//print "<tr>";
+ $sqljoin="SELECT * 
+  From customer_side_db.bus INNER JOIN device_database.devices 
+  ON customer_side_db.bus.DeviceUniqueId= device_database.devices.uniqueid
+  INNER JOIN device_database.positions 
+  ON  device_database.devices.id = device_database.positions.deviceid
+  WHERE customer_side_db.bus.DeviceUniqueId=$L
+  ORDER BY device_database.positions.devicetime DESC
+  LIMIT 1 ";
+  $resultjoin =($db1->query($sqljoin) ) AND ($db2->query($sqljoin));
+  if($resultjoin == null  )
+{echo '<strong><h4>There is No tracked buses</strong></h4>';}
+else{
+
+  while($row = $resultjoin->fetch_assoc()) 
+  {
+//$Did=$row['DeviceUniqueId'] ;
+$SpeedLimit=$row['SpeedLimit'];
+$Speed=$row['speed'];
+///////////
+$sqllink= ("SELECT * From Bus WHERE ID=$counter");
+$resultlink = $db1->query($sqllink);
+  print "<tr>"; 
+print "<td>" .$row['DeviceUniqueId'] . "</td>"; 
+print "<td>" .$row['name'] . "</td>"; 
+print "<td>" .$row['speed'] . "</td>";
 print "<td>" . $LP=$row['LicensePlate'] . "</td>"; 
 print "<td>" . $row['BusType'] . "</td>"; 
 print "<td>" . $row['DeviceUniqueId'] . "</td>"; 
@@ -124,11 +160,10 @@ print "<td>" . $row['BusStatus'] . "</td>";
 print "<td> <a href =reports.php?ID=$counter&LicensePlate=$LP  View Report </a></td>";
 print "<td> <a href = 'map.php' > Show Map </a></td> "; //to make it open in new window (target=_blank) //?id=$counter &LicensePlate=$LP
 print "</tr>"; 
+}
 
-//$_SESSION["ID"] = $counter;
-//$_SESSION["LPL"] = $LP;
 $counter=$counter+1;
-} 
+}}}
 }
  
 ?>
