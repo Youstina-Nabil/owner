@@ -31,14 +31,14 @@ $result = mysql_query($sql);;
 while($row = mysql_fetch_array($result, MYSQL_ASSOC)) 
 { 
 print "<tr><th>Company Name </th><td>" . $row['CompanyName'] . "</td></tr>";
-print "<tr><th>Fleet Owner Id</th><td>" . $row['FleetOwnerId'] . "</td></tr>";
+print "<tr><th>Fleet Owner ID</th><td>" . $row['FleetOwnerId'] . "</td></tr>";
 print "<tr><th>First Name </th><td>" . $row['FName'] . "</td></tr>"; 
 print "<tr><th>Last Name </th><td>" . $row['LName'] . "</td></tr>";
 print "<tr><th>User Name</th><td>" . $row['UserName'] . "</td></tr>";
 print "<tr><th>Email</th><td>" . $row['Email'] . "</td></tr>";
 print "<tr><th>Phone Number</th><td>" . $row['OwnerPhoneNumber'] . "</td></tr>";
-print "<tr><th>No Of Buses</th><td>" . $row['NoOfBuses'] . "</td></tr>";
-print "<tr><th>Maximum No Of Buses</th><td>" . $row['MaxNoOfBuses'] . "</td></tr>";
+print "<tr><th>Number of Buses</th><td>" . $row['NoOfBuses'] . "</td></tr>";
+print "<tr><th>Maximum Number of Buses</th><td>" . $row['MaxNoOfBuses'] . "</td></tr>";
 print "<tr><th>Account Price</th><td>" . $row['AccPrice'] . "</td></tr>";
 } 
 print "</table>"; 

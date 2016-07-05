@@ -301,17 +301,22 @@ option {
                                   {	
 							           $driverid=$rowget['DriverID'];         
                                   } 				
-			            $sql1 = "INSERT INTO `bus`(`LicensePlate`, `TicketPrice`, `GeofenceId`, `GeofenceName`, `SpeedLimit`,`BusCompanyName`,`GrandCompanyName`, `OwnerUserName`, `BusYardName`, `DeviceSerial`) 
+			            $sql1 = "INSERT INTO `bus`(`LicensePlate`, `TicketPrice`, `GeofenceId`, `GeofenceName`, `SpeedLimit`,`BusCompanyName`,`GrandCompanyName`, `OwnerUserName`,  `DeviceSerial`) 
 				          VALUES ('$LicensePlate','$price','$gid','$gname','$speedlimit','Green','$companyname','$username','$busyard','$device')  ";
                         
 						//$sql1="INSERT INTO `customer_side_db`.`bus` (`LicensePlate`, `BusNo`, `BusLine`, `BusCompanyName`, `GeofenceId`, `GeofenceName`, `Speed`, `SpeedLimit`, `GrandCompanyName`, `OwnerUserName`, `TireLastChangeDate`, `KmLeftForNextTireChange`, `LastMaintenceDate`, `Distance`, `BusStatus`, `FuelLevel`, `FuelCapacity`, `DeviceSerial`, `SimPhoneNo`, `CurrentLatitude`, `CurrentLongtitude`, `CurrentLocationTime`, `DeviceInstallationTime`, `DeviceResetTime`, `BusYardName`, `TicketPrice`) VALUES 
 						//( '$LicensePlate', '$bno', '$bline', 'Green', '12', 'goename', '76', '687', 'El Sakr', 'sakr', '', '', '', '', '', '', '', '4365468', '678789789', '', '', '', '', '', 'arab', '6');";
+						$sqlbusyard="INSERT INTO `busyard`(`BusyardName`) VALUES ($busyard)";
+						$querybusyard = mysql_query($sqlbusyard);
+                        if(!mysql_query($sqlbusyard)){die('Error :'.mysql_error());}
+						
 						
 						$query1 = mysql_query($sql1);
                         if(!mysql_query($sql1)){die('Error :'.mysql_error());}
 						$sqldriver="INSERT INTO `drives`(`DriverID`,  `LicensePlate`) VALUES ('$driverid','$LicensePlate')";
 						$querydriver = mysql_query($sqldriver);
                         if(!mysql_query($sqldriver)){die('Error :'.mysql_error());}
+                        
 					     //  }						
 							  } 		
 										                            }
