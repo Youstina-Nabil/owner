@@ -22,11 +22,10 @@ session_start();
 
 
 <?php
-$_SESSION["OUN"] ="heba14";
-$OUN = trim($_SESSION["OUN"]);
+$companyname=$_SESSION["cname"];$username=$_SESSION["username"]; 
 require ('config.php');
 echo'<h3><strong> Personal Information</strong></h3>';
-$sql = ("SELECT * FROM fleetowner WHERE UserName='youyou'");
+$sql = ("SELECT * FROM fleetowner WHERE UserName='$username'");
 $result = mysql_query($sql);;
 while($row = mysql_fetch_array($result, MYSQL_ASSOC)) 
 { 
