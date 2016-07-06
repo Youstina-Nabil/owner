@@ -1,13 +1,8 @@
 <?php
-error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
 session_start();
-
-
-//error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
+error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
 require ('config.php');
-
-
-    
+ 
 if(isset($_POST['submit']))
 {   
 	$v3=$_POST['pwd'];

@@ -22,12 +22,15 @@ session_start();
 
 
 <?php
-$_SESSION["OUN"] ="heba14";
-$OUN = trim($_SESSION["OUN"]);
+$user=$_SESSION["username"];
+$companyname =$_SESSION["cname"] ;
 require ('config.php');
+$sql = ("SELECT * FROM fleetowner WHERE UserName='$user' AND CompanyName='$companyname'");
+$result = mysql_query($sql);
+  if($result ==null)
+{echo '<h4><strong>There is No Personal information!!</strong></h4>';}
+else{
 echo'<h3><strong> Personal Information</strong></h3>';
-$sql = ("SELECT * FROM fleetowner WHERE UserName='youyou'");
-$result = mysql_query($sql);;
 while($row = mysql_fetch_array($result, MYSQL_ASSOC)) 
 { 
 print "<tr><th>Company Name </th><td>" . $row['CompanyName'] . "</td></tr>";
@@ -40,8 +43,9 @@ print "<tr><th>Phone Number</th><td>" . $row['OwnerPhoneNumber'] . "</td></tr>";
 print "<tr><th>Number of Buses</th><td>" . $row['NoOfBuses'] . "</td></tr>";
 print "<tr><th>Maximum Number of Buses</th><td>" . $row['MaxNoOfBuses'] . "</td></tr>";
 print "<tr><th>Account Price</th><td>" . $row['AccPrice'] . "</td></tr>";
-} 
+}} 
 print "</table>"; 
+
 ?>
     
 </div>

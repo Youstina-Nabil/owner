@@ -52,6 +52,7 @@ session_start();
       <th>Device name</th>
       <th>Speed</th>
       <th>License Plate </th>
+      <th>Device Installation Time </th>
       <th>Bus Type</th>
       <th>Device Unique Id </th>
       <th>Sim Phone Number </th>
@@ -62,6 +63,8 @@ session_start();
      
 
 <?php
+$user=$_SESSION["username"];
+$companyname =$_SESSION["cname"] ;
 
   $db1 = new mysqli('localhost','root','','customer_side_db');
   $db2 = new mysqli('localhost','root','','device_database');
@@ -73,9 +76,8 @@ if ($db2->connect_error) {
 } 
 //require ("conditions.php");
 $counter=1;
-$sql = ("SELECT DISTINCT LicensePlate,DeviceUniqueId FROM bus ");
+$sql = ("SELECT DISTINCT LicensePlate,DeviceUniqueId FROM bus Where OwnerUserName='$user' AND CompanyName='$companyname'");
 $result = $db1->query($sql);
-
 if($result ==null)
 {echo '<strong>There is No buses in your fleet</strong>';}
 else{
@@ -112,6 +114,7 @@ print "<td>" .$row['DeviceUniqueId'] . "</td>";
 print "<td>" .$row['name'] . "</td>"; 
 print "<td>" .$row['speed'] . "</td>";
 print "<td>" . $LP=$row['LicensePlate'] . "</td>"; 
+print "<td>" . $row['DeviceInstallationTime'] . "</td>"; 
 print "<td>" . $row['BusType'] . "</td>"; 
 print "<td>" . $row['DeviceUniqueId'] . "</td>"; 
 print "<td>" . $row['SimPhoneNo'] . "</td>";

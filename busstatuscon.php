@@ -1,5 +1,5 @@
 <?php    
-header('Location: BusStatus.php');    
+header('Location: busstatus.php');    
 ?>
 <?php
 session_start();
@@ -66,12 +66,14 @@ if ($db1->connect_error) {
 if ($db2->connect_error) {
     die("Connection failed: " . $db2->connect_error);
 } 
+$user=$_SESSION["username"];
+$companyname =$_SESSION["cname"] ;
 $sqlStatus1 = ("UPDATE bus SET BusStatus = 'Working' " );
 $resultS1 = $db1->query($sqlStatus1);
 
 $counter=1;
 
-$sql = ("SELECT DISTINCT LicensePlate,DeviceUniqueId FROM bus ");
+$sql = ("SELECT DISTINCT LicensePlate,DeviceUniqueId FROM bus Where OwnerUserName='$user' AND CompanyName='$companyname' ");
 $result = $db1->query($sql);
 
 if($result ==null)
@@ -154,7 +156,7 @@ $sqlStatus1 = ("UPDATE bus SET BusStatus = 'Not Working Correctly' WHERE ID =$co
 $resultS1 =$db1->query($sqlStatus1);
 }
 
-if($fuellevel < 40)
+if($fuellevel < 10)
 {
 //echo "c :".$counter ."bs";
 $sqlStatus2 = ("UPDATE bus SET BusStatus = 'Not Working Correctly' WHERE ID =$counter" );
