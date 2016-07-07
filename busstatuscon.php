@@ -110,7 +110,6 @@ $datetime2 = new DateTime($timeNow );
 $datetime3 = new DateTime($row['LastMaintenanceDate']);
 $interval = $datetime1->diff($datetime2);
 $interval2 = $datetime3->diff($datetime2);
-
 if ($interval->format('%R%a days') >=  90 || $interval2->format('%R%a days') >=  90)
 {
 $ok= '0';
@@ -137,14 +136,15 @@ $fuel2 =strchr($fuel1,",",1);
 $fuel =strchr($fuel2,":",0);
 $fuel =ltrim($fuel,':');
 $fuellevel= ((1024-$fuel)/1024)*100;
-//oil
 
+//oil
 $oil1 =strchr($attr,"adc2");
-//echo $fuel1;
 $oil2 =strchr($oil1,",",1);
 $oil =strchr($oil2,":",0);
 $oil =ltrim($oil,':');
 $oillevel= ((1024-$oil)/1024)*100;
+
+
 //echo "level :".$fuellevel ;
 $sqlStatus = ("UPDATE bus SET FuelLevel =	$fuel where ID =$counter");//($Speed > $SpeedLimit)  ||
 $resultS = $db1->query($sqlStatus);

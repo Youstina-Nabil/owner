@@ -45,10 +45,6 @@ while($row = $resultlink->fetch_assoc())
 print "<tr><th>License Plate </th><td>" . $row['LicensePlate'] . "</td></tr>"; 
 print "<tr><th>Bus type </th><td>" . $row['BusType'] . "</td></tr>"; 
 //print "<tr><th>Geofence Name </th><td>" . $row['GeofenceName'] . "</td></tr>";
-print "<tr><th>Speed Limit </th><td>" . $row['SpeedLimit'] . "</td></tr>";
-print "<tr><th>Tire Last Change Date </th><td>" . $row['TireLastChangeDate'] . "</td></tr>";
-print "<tr><th>Last Maintence Date </th><td>" . $row['LastMaintenanceDate'] . "</td></tr>";
-print "<tr><th>Bus Status </th><td>" . $row['BusStatus'] . "</td></tr>";
 print "<tr><th>Sim Phone No </th><td>" . $row['SimPhoneNo'] . "</td></tr>";
 print "<tr><th>Device Installation Time </th><td>" . $row['DeviceInstallationTime'] . "</td></tr>";
 print "<tr><th>Device Reset Time </th><td>" . $row['DeviceResetTime'] . "</td></tr>";
@@ -98,29 +94,141 @@ print "<tr><th>Bus number</th><td>" . $row['BusNo'] . "</td></tr>";
 else{
 //echo "<h3><strong>Device information</strong></h3>";
   while($row = $resultjoin->fetch_assoc()) 
-{ $attr =$row['attributes'];
+{ 
+$attr =$row['attributes'];
+$SpeedLimit=$row['SpeedLimit'];
+$Speed=$row['speed'];
+//tire & maintenance
+$timeNow = date("Y-m-d");
+$datetime1 = new DateTime($row['TireLastChangeDate']);
+$datetime2 = new DateTime($timeNow );
+$datetime3 = new DateTime($row['LastMaintenanceDate']);
+$interval = $datetime1->diff($datetime2);
+$interval2 = $datetime3->diff($datetime2);
+
 //fuel
 $fuel1 =strchr($attr,"adc1");
 $fuel2 =strchr($fuel1,",",1);
 $fuel =strchr($fuel2,":",0);
 $fuel =ltrim($fuel,':');
 $fuellevel= ((1024-$fuel)/1024)*100;
+if($fuellevel < 10)
+{
+$fuelErr='<font color="red">"Fuel Level is too low"</font>';
+}
+else{$fuelErr=$fuellevel;}
 //oil
-
 $oil1 =strchr($attr,"adc2");
-//echo $fuel1;
 $oil2 =strchr($oil1,",",1);
 $oil =strchr($oil2,":",0);
 $oil =ltrim($oil,':');
 $oillevel= ((1024-$oil)/1024)*100;
+if($oillevel < 40)
+{
+$oilErr='<font color="red">"Oil Level is too low"</font>';
+}
+else{$oilErr=$oillevel;}
+//speed
+if($Speed > $SpeedLimit)
+{
+$SpeedErr='<font color="red">"Speed Exceeds Speed Limit"</font>';
+}
+else{$SpeedErr=$Speed;}
+//tire and maintenance
+if($interval->format('%R%a days') >=  90 )
+{
+$tireErr='<font color="red">"You need to check your tires"</font>';
+}
+else{$tireErr=$interval->format('%R%a days');}
+if($interval2->format('%R%a days') >=  90)
+{
+$maintenanceErr='<font color="red">"Your bus needs maintenance "</font>';
+}
+else{$maintenanceErr= $interval2->format('%R%a days');}
+
+//processing bits
+$status12 =strchr($attr,"status");
+$status122 =strchr($status12,",",1);
+$status1222 =strchr($status122,":",0);
+$status1222 =trim($status1222,':"');
+$sub1=substr($status1222,0,1);
+$sub1 =base_convert($sub1,16,2);
+//bit 12
+if($sub1== 1 || $sub1== 11 || $sub1== 101|| $sub1== 111|| $sub1== 1001|| $sub1== 1011|| $sub1== 1101|| $sub1== 1111)
+{
+$temp= '<font color="red">"Temperature of engine is high"</font>';
+}
+else
+{
+$temp ="Temperature of engine is moderate";
+}
+//status bit 11,10,9,8
+$sub2=substr($status1222,1,1);
+$sub2 =base_convert($sub2,16,2);
+//bit 11
+$sub2=substr($status1222,1,1);
+$sub2 =base_convert($sub2,16,2);
+if($sub2==1000 || $sub2==1001 || $sub2==1010 || $sub2==1011 || $sub2==1100 || $sub2==1101 || $sub2==1110 || $sub2==1111)
+{
+$accident= '<font color="red">"Your Bus made accident!"</font>';
+}
+else
+{
+$accident ="Your bus is safe";
+}
+//bit 10
+if($sub2==100 || $sub2==101 || $sub2==110 || $sub2==111 || $sub2==1100 || $sub2==1101 || $sub2==1110 || $sub2==1111 )
+{
+$smoke= '<font color="red">"Bus is on fire"</font>';
+}
+else
+{
+$smoke ="Your bus is safe";
+}
+//bit 9
+if($sub2==10 || $sub2==11 || $sub2==110 || $sub2==111 || $sub2==1010 || $sub2==1011 || $sub2==1110 || $sub2==1111 )
+{
+$Seatbelt= '<font color="red">"Drivers seatbelt is Not worn"</font>';
+}
+else
+{
+$Seatbelt ="Driver's seatbelt is worn";
+}
+//bit8
+if($sub2== 1 || $sub2== 11 || $sub2== 101|| $sub2== 111|| $sub2== 1001|| $sub2== 1011|| $sub2== 1101|| $sub2== 1111)
+{
+$SOS= '<font color="red">"SOS is pressed"</font>';
+}
+else
+{
+$SOS ="SOS is Not pressed";
+}
+
 print "<tr><th>Device ID</th><td>" . $row['uniqueid'] . "</td></tr>"; 
 print "<tr><th>Device Name </th><td>" . $row['name'] . "</td></tr>"; 
 print "<tr><th>Latitude</th><td>" . $row['latitude'] . "</td></tr>";
 print "<tr><th>Longitude</th><td>" . $row['longitude'] . "</td></tr>";
 print "<tr><th>Altitude</th><td>" . $row['altitude'] . "</td></tr>";
+print "<tr><th>Speed Limit </th><td>" . $row['SpeedLimit'] . "</td></tr>";
 print "<tr><th>speed</th><td>" . $row['speed'] . "</td></tr>";
 print "<tr><th>Fuel Level</th><td>" .$fuellevel."%". "</td></tr>";
 print "<tr><th>Oil Level</th><td>" . $oillevel. "%"."</td></tr>";
+print "</table>"; 
+echo '<table class="table table-striped">';
+if($row['BusStatus'] =='Not Working Correctly')
+{
+echo "<strong><h3>Bus Status : " . $row['BusStatus']."</strong></h3>"; 
+print "<tr><th>Speed </th><td>" . $SpeedErr. "</td></tr>";
+print "<tr><th>Fuel Level </th><td>" . $fuelErr. "</td></tr>";
+print "<tr><th>Oil Level </th><td>" . $oilErr. "</td></tr>";
+print "<tr><th>Car Tires</th><td>" . trim($tireErr,'+'). "</td></tr>";
+print "<tr><th>Maintenance Date </th><td>" . trim($maintenanceErr,'+'). "</td></tr>";
+print "<tr><th>Engines' Temperatue </th><td>" . $temp. "</td></tr>";
+print "<tr><th>Accident status </th><td>" . $accident. "</td></tr>";
+print "<tr><th>Fire Status </th><td>" . $smoke. "</td></tr>";
+print "<tr><th>Seatbelt status</th><td>" . $Seatbelt. "</td></tr>";
+print "<tr><th>SOS button </th><td>" . $SOS. "</td></tr>";
+}
 }
 }
 print "</table>"; 
