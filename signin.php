@@ -47,7 +47,7 @@ else{
                 if (mysql_num_rows($res)) {
                           mysql_free_result($res);    $_SESSION["id"] = $fleetid;
                             $_SESSION["cname"] = $companyname;  $_SESSION["username"] = $username; 
-                             header("Location:ownerhome21.php"); 
+                             header("Location:personal.php"); 
 			                               }
                                  
                 else  

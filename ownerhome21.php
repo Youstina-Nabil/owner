@@ -25,6 +25,15 @@ $(document).ready(function()
 $("#flip").click(function(){
         $("#panel").slideToggle("slow");
     });	
+$("#flip1").click(function(){
+	$("#panel1").slideToggle("slow");
+});	
+$("#flip2").click(function(){
+	$("#panel2").slideToggle("slow");
+});
+$("#flip3").click(function(){
+	$("#panel3").slideToggle("slow");
+});		
 $(".edit_tr").click(function()
 {
 var ID=$(this).attr('id');
@@ -80,24 +89,26 @@ $(".text").show();
 });
 </script>
 <style>
-#panel, #flip {
-	color: grey;
+#panel, #flip ,#flip1, #panel1,#flip2, #panel2,#flip3, #panel3{
+	color: black;
     padding: 5px;
     text-align: center;
-  
+    background-color: #f3f3f3;
     border: solid 1px #f3f3f3;
 }
 
-#panel {
+#panel, #panel1,#panel2,#panel3{
     padding: 50px;
     display: none;
 }
 </style>
          <body>
-          <form name="own" action="ownerhome21.php" onsubmit="submitfn()"  method="post">
-
+         
+<form name="own" action="ownerhome21.php" onsubmit="submitfn()"  method="post">
               <div class="col-lg-3"></div>
-	<div class="col-lg-6">     <table class="table table-striped" style="margin-top: 50">
+	<div class="col-lg-6" " > 
+     
+    <table class="table table-striped" style="margin-top: 50">
 		  <tr>
             <th></th>		  
 		    <th>Manager Name</th>
@@ -106,7 +117,7 @@ $(".text").show();
 		    <th> Phone </th>
 		    <th>  City</th>
 		    <th>  Street</th>
-		    <th> Yard Name</th>
+		    <th colspan=10> Assigned Bus Lines</th>
 		 </tr>
 <?php
 session_start();
@@ -122,8 +133,8 @@ while($row = mysql_fetch_array($query))
 {
 $fname=$row['ManagerFName'];
 $lname=$row['ManagerLName'] ;	
-$mi=$row['ManagerID']; 	
-$id=$row['AccountId'];
+$mi=$row['ManagerId']; 	
+$id=$row['SubAccountId'];
 $me=$row['ManagerEmail']; 
 $mp=$row['ManagerPhoneNo'];
 $mc=$row['ManagerCity'];
@@ -139,17 +150,17 @@ $ms=$row['ManagerStreet'];
  <td><div><?php echo $ms; ?></div></td>
 	
 <?php	
-$sql1 = "SELECT  * FROM supervise where AccountId=$id" ;
+$sql1 = "SELECT  * FROM edit where SubAccountId=$id" ;
 $query1 = mysql_query($sql1);           
 if(!mysql_query($sql1)){die('Error :'.mysql_error());}
 while($row1 = mysql_fetch_array($query1))
-{ $by=$row1['YardName'];
+{ $bl=$row1['BusLineName'];
 	
 ?>	
 
 <td class="edit_td">
-<span id="by_<?php echo $id; ?>" class="text"><?php echo $by; ?></span> 
-<input type="text" value="<?php echo $by; ?>" class="editbox" id="by_input_<?php echo $id; ?>"/>
+<span id="by_<?php echo $id; ?>" class="text"><?php echo $bl; ?></span> 
+<input type="text" value="<?php echo $bl; ?>" class="editbox" id="by_input_<?php echo $id; ?>"/>
 </td>
 
 <?php
@@ -165,9 +176,10 @@ while($row1 = mysql_fetch_array($query1))
  
  </table >
  <button type="submit" value="Remove " name="submit" class="btn btn-danger form-control">Remove Manager</button>
+ </form> 
  <div id="flip" align="center"> ADD  Manager</div>
 
- </form> 
+ 
  <div id="panel"><?php  error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
 require ('config.php'); 
  echo'<style>select:required:invalid {
@@ -189,16 +201,7 @@ option {
      <input type="text" name="email" placeholder="E-mail " step="1" required class="form-control">
      <input type="text" name="city" placeholder="City" step="1" required class="form-control">
      <input type="text" name="street" placeholder="Street "  step="1" required class="form-control">
-	<br> <select required size="1" name="D1"  class="form-control"                        
-          <option>--</option><option value="" disabled selected hidden>Yard Name</option> 	 ';
-     $sql = "SELECT * FROM `busyard` ";
-     $query = mysql_query($sql);
-     while($row = mysql_fetch_array($query))
-     {	$busyard=$row['Name'];         
-        echo "<option>$busyard</option> " ;
-     }                           
- 
-     echo '  </select><br>
+	 <br>
 	 <input type="submit" name="submit1" value="ADD" class="btn btn-danger"><br>  
                         </form> </div>
                      '
@@ -218,22 +221,22 @@ option {
 		       $email=$_POST['email'];
 		       $city=$_POST['city'];
 		       $street=$_POST['street'];
-			   $yardname= filter_input(INPUT_POST, 'D1'); echo $accid ; echo $yardname;	
+			   $yardname= filter_input(INPUT_POST, 'D1');// echo $accid ; echo $yardname;	
 			   $sql = "SELECT * FROM `manager` where ManagerID='$ssn' or ManagerEmail='$email' ";
                $query = mysql_query($sql);
                if(!mysql_query($sql)){die('Error :'.mysql_error());}  
-               if(mysql_num_rows($query)>0){echo'This manager already exists';}
+               if(mysql_num_rows($query)>0){/*echo'This manager already exists';*/}
                else{
 				       $sqlcheck="SELECT * FROM `manager` where PW='$pwd'";
 					   $querycheck = mysql_query($sqlcheck);
 					   if(mysql_num_rows($querycheck)>0){echo 'Change your Password to be unique';}
                        else{		
-						   $sqlin="INSERT INTO `supervise` (`AccountId`, `YardName`) VALUES ( $accid, '$yardname') ";
-						   $sql1 = "INSERT INTO `manager`(`AccountId`, `PW`, `CompanyName`, `OwnerUserName`, `ManagerFName`, `ManagerLName`, `ManagerID`, `ManagerEmail`, `ManagerPhoneNo`, `ManagerStreet`, `ManagerCity`) 
+						//   $sqlin="INSERT INTO `supervise` (`AccountId`, `YardName`) VALUES ( $accid, '$yardname') ";
+						   $sql1 = "INSERT INTO `manager`(`SubAccountId`, `PW`, `CompanyName`, `OwnerUserName`, `ManagerFName`, `ManagerLName`, `ManagerId`, `ManagerEmail`, `ManagerPhoneNo`, `ManagerStreet`, `ManagerCity`) 
 				           VALUES ('$accid','$pwd','$companyname','$username','$fname','$lname','$ssn','$email','$num','$street','$city')  ";
                            $query1 = mysql_query($sql1);
-                           $queryin = mysql_query($sqlin);
-						   if(!mysql_query($sqlin)){die('Error :'.mysql_error());}                  
+                        //   $queryin = mysql_query($sqlin);
+						//   if(!mysql_query($sqlin)){die('Error :'.mysql_error());}                  
      					   if(!mysql_query($sql1)){die('Error :'.mysql_error());}
 	                       		
 						   }						
@@ -241,7 +244,88 @@ option {
 	        }
 	   }
        
-	   ?></div></div>
+	   ?>
+	   <br>
+	   <div id="flip3">Assigne Manager to Line</div>
+       <div id="panel3"> <?php
+         error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
+        require ('config.php'); 
+ echo'<style>select:required:invalid {
+  color: #999;
+}
+option[value=""][disabled] {
+  display: none;
+}
+option {
+  color: black;
+}</style>
+     <form method="post"  action="ownerhome21.php">   
+          <select required size="1" name="name"                          
+          <option>--</option><option value="" disabled selected hidden> Manager Name</option> 	';
+		  
+		  $sqlname = "SELECT * FROM `manager` where CompanyName='$companyname' and OwnerUserName='$username' ";
+          $queryname = mysql_query($sqlname);
+          while($rowname = mysql_fetch_array($queryname))
+          {$fname=$rowname['ManagerFName'];
+           $lname=$rowname['ManagerLName'] ;	
+          
+			echo "<option> $fname $lname </option> " ;
+	    	
+          }                              
+     echo ' 
+     	  </select>
+          <select required size="1" name="no"                          
+          <option>--</option><option value="" disabled selected hidden> Bus Line & Number</option>'; 	
+		  $sqlno = "SELECT * FROM `busline` where CompanyName='$companyname' and OwnerUserName='$username' ";
+          $queryno = mysql_query($sqlno);
+          while($rowno = mysql_fetch_array($queryno))
+          {	$busline=$rowno['BusLineName'];
+	       $busno=$rowno['BusNo'];
+		   echo "<option>$busline:$busno</option> " ;
+          }   
+		  
+		  
+	 echo ' 
+     	  </select>	  
+		  
+	<input type="submit" name="submit4" value="ADD" class="btn btn-danger"><br>  
+                        </form>
+	 ';
+	 if(!isset($_POST['submit4']))
+       {  }
+      else{
+		   if(isset($_POST['name']))
+            {
+				if(isset($_POST['no']))
+                {			
+			    $name=filter_input(INPUT_POST, 'name');
+			    $num=filter_input(INPUT_POST, 'no');
+				//$num1 = explode(" ", $name);
+			    $managername = explode(" ", $name);
+				list($line, $number) = explode(":", $num);
+                $sqlget="SELECT * FROM `manager` where ManagerFName='$managername[0]' and ManagerLName='$managername[1]'";
+			    $queryget = mysql_query($sqlget);
+				while($rowget = mysql_fetch_array($queryget))
+                    {	
+							           $managerid=$rowget['SubAccountId'];       
+                    } 					       
+    			$sqlbl1="INSERT INTO `edit`(`SubAccountId`, `BusLineName`, `BusNo`) VALUES('$managerid','$line','$number')";
+                $querybl1 = mysql_query($sqlbl1);
+               
+			   // if(!mysql_query($sqlbl1)){die('Error :'.mysql_error());}
+			    
+				}
+			}
+	  }
+      ?>
+	   
+	   </div>
+	   
+	  
+
+
+	   
+	          </div>
               <div class="col-lg-3"></div>
 
 
@@ -260,10 +344,10 @@ else {
     
 	foreach($_POST['removed'] as $selected) {
 		
-       	$sql2 = "DELETE FROM `supervise` WHERE AccountId= $selected  ";
-        $query2 = mysql_query($sql2);
-        if(!mysql_query($sql2)){die('Error :'.mysql_error());}	     
-		$sql3 = "DELETE FROM `manager` WHERE AccountId= $selected  ";
+     //  	$sql2 = "DELETE FROM `supervise` WHERE AccountId= $selected  ";
+     //   $query2 = mysql_query($sql2);
+     //   if(!mysql_query($sql2)){die('Error :'.mysql_error());}	     
+		$sql3 = "DELETE FROM `manager` WHERE SubAccountId= $selected  ";
         $query3 = mysql_query($sql3);
         if(!mysql_query($sql3)){die('Error :'.mysql_error());}		
 		}

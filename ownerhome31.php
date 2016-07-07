@@ -253,7 +253,6 @@ echo "<option>--</option> ";
 echo '<option value="" disabled selected hidden> </option> ';
 
 
-
 					   
 $sql1 = "SELECT * FROM  assigned_to  INNER JOIN  `busline`  on assigned_to.BusNo=busline.BusNo and assigned_to.BusLineName=busline.BusLineName where CompanyName='$companyname' and OwnerUserName='$username'  ";
 $query1 = mysql_query($sql1);
