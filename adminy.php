@@ -55,6 +55,7 @@ $sql = "SELECT * FROM `customer` ";
 while($row2 = $query->fetch_assoc())
 {
 $ap=$row2['Approved'];
+
 if($ap==1){	
 //WHERE device_database.user_device.userid=device_database.users.id";
 // INNER JOIN device_database.users 
@@ -66,6 +67,7 @@ else{
 while($row =$resultjoin->fetch_assoc())
 {
 $id=$row["id"];
+$custID=$row['CustomerID'];
 $sqlup =("SELECT COUNT(*) as devices FROM user_device WHERE userid=$id " );
 $queryup =$db2->query($sqlup);
 $data=$queryup->fetch_assoc();
@@ -75,12 +77,7 @@ echo "<tr>";
 echo '<td class="lalign">' . $row['FName']  ."  " . $row['LName'] ."</td>";
 echo "<td>" . $row['CompanyName'] . "</td>";
 echo "<td>" . $row['AccountName'] . "</td>";
-echo '<td>
-      <form name="f1" action="adminedit.php" >
-      <button name="change" type="submit" value="change">' . $buses . "</button>
-                </form>
-                <td>				
-				";
+echo "<td><a href='adminedit.php?custID=$custID' > $buses</a></td>";
 echo "</tr>";
 }}
 }

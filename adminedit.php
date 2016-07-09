@@ -79,21 +79,23 @@ session_start();
           
           <div class="col-lg-6">
               <div class="panel panel-default" id="add">
-      <div class="panel-heading">Add new bus</div>
+      <div class="panel-heading">Add new device</div>
       <div class="panel-body">
         <link rel="stylesheet" href="style.css">
 
             
-        <h3> You can add new buses from here </h3>
+        <h3> You can add new devices from here </h3>
 
 <form method="post" name ="add" id="Fadd" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">   
 <input type="hidden" name="custID"  value="<?php echo $_REQUEST['custID'] ;?> " >
-  Device Serial: <input type="number" name="deviceSerial"  step="1" required>
+    Device Unique ID: <input type="number" name="deviceSerial"  step="1" required>
  
   <br><br>
     SIMPCARD Number: <input type="number" name="SIMPhoneNumber"  step="1" required >
   
   <br><br>
+
+
   <input type="submit" name="addsubmit" value="Submit">  
 </form>
 
@@ -106,13 +108,13 @@ session_start();
           
           <div class="col-lg-6">
               <div class="panel panel-default" id="remove">
-      <div class="panel-heading">Remove bus</div>
+      <div class="panel-heading">Remove device</div>
       <div class="panel-body">
 
 
 
 
-          <h3> You can remove buses from here  </h3>
+          <h3> You can remove devices from here  </h3>
      
 <form method="post" name="remove" id="Fremove" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 <input type="hidden" name="custID"  value="<?php echo $_REQUEST['custID'] ;?> " >
@@ -149,10 +151,23 @@ session_start();
 error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
 error_reporting(E_ALL ^ E_NOTICE);
 
-					   require ('config2.php');
-					
+					 
+  $db1 = new mysqli('localhost','root','','serviceprovider_db');
+  $db2 = new mysqli('localhost','root','','device_database');
+  $db3 = new mysqli('localhost','root','','customer_side_db');
+if ($db1->connect_error) {
+    die("Connection failed: " . $db1->connect_error);
+} 
+if ($db2->connect_error) {
+    die("Connection failed: " . $db2->connect_error);
+}
+if ($db3->connect_error) {
+    die("Connection failed: " . $db3->connect_error);
+}
 
+    	 //$LPErr=
     	 $SIMErr = $deviceSerialErr =  "";
+         //$LP=
          $SIM= $deviceSerial =  "";
          
          if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -168,6 +183,11 @@ error_reporting(E_ALL ^ E_NOTICE);
             }else {
                $SIM = test_input($_POST["SIMPhoneNumber"]);
             }
+            /* if (empty($_POST["LP"])) {
+                $LPErr = "LP is required";
+            }else {
+               $LP = test_input($_POST["LP"]);
+            }*/
           
          }
           function test_input($data) {
@@ -185,48 +205,66 @@ error_reporting(E_ALL ^ E_NOTICE);
 $custID =$_REQUEST['custID'];
 if (!empty($_POST['addsubmit'])) {
 //check if this data is duplicated
-$sqlup=( "SELECT * FROM device WHERE SIMPhoneNumber=$SIM  OR DeviceSerial=$deviceSerial  ");
-$resultup = mysql_query($sqlup);
-$num_rows = mysql_num_rows($resultup);
-//echo $num_rows;
-if ($num_rows > 0  ){
-echo'<P><strong>There exists device with this serial number or with the same SIM phone number</strong><P>';
-}
+$sqlup=( "SELECT * FROM devices WHERE uniqueid=$deviceSerial  ");
+$resultup = $db2->query($sqlup);
+  if($resultup == null  )
+{echo'<P><strong>There exists device with this serial number</strong><P>';}
 else{
-
-$sql=("SELECT NoOfBuses FROM customer WHERE CustomerID=$custID and (NoOfBuses+1) < MaxNoOfBuses");
-$result = mysql_query($sql);
-$num_rows = mysql_num_rows($result);
+ 
+$sql=("SELECT * FROM customer WHERE CustomerID=$custID and (NoOfBuses+1) < MaxNoOfBuses");
+$result = $db1->query($sql);
+  if($result == null  )
+{echo'<P><strong> You can NOT add more buses</strong><P>';}
+else{
+  while($row = $result->fetch_assoc()) 
+  {
+  //echo $custID;
+$email=$row["Email"];
+$cname=$row["CompanyName"];
+$username=$row["Username"];
+//$result = $db3->query($sql);
+//$num_rows = mysql_num_rows($result);
 //echo $num_rows;
-if ($num_rows == 1 ){
+//if ($num_rows == 1 ){
 //echo "hi";
-$sqladd = ("INSERT INTO device (DeviceSerial,SIMPhoneNumber,CustomerID) VALUES ( $deviceSerial,$SIM,$custID) ");
-$sqladd1 = ("UPDATE customer SET NoOfBuses =(NoOfBuses+1) WHERE CustomerID = $custID " );
-$resultadd = mysql_query($sqladd);
-$resultadd1 = mysql_query($sqladd1);
-echo'<P><strong> New bus is added</strong><P>'."</br>";
+//echo $cname;
+$timeNow = date("Y-m-d");
+$sqladd2 = ("INSERT INTO device (DeviceUniqueID,SIMPhoneNumber, InstallationTime, ResetTime,CustomerID) VALUES ('$deviceSerial','$SIM','$timeNow','$timeNow','$custID') ");
+$resultadd2 = $db1->query($sqladd2);
+//echo "hi";
+$sqladd = ("INSERT INTO devices (uniqueid,name) VALUES ( '$deviceSerial','$cname') ");
+$resultadd = $db2->query($sqladd);
+//echo "hi";
+//$sqladd1 = ("INSERT INTO users (name,email) VALUES ( $cname,$email) ");
+//$resultadd1 = $db2->query($sqladd1);
 
+//$sqladd3 = ("INSERT INTO bus (LicensePlate,CompanyName,OwnerUserName,DeviceUniqueId,SimPhoneNo) VALUES ( '$LP','$cname','$username','$deviceSerial','$SIM') ");
+//$resultadd3 = $db3->query($sqladd3);;
+$sqladd1 = ("UPDATE customer SET NoOfBuses =(NoOfBuses+1) WHERE CustomerID = $custID " );
+$resultadd1 = $db1->query($sqladd1);
+
+echo'<P><strong> New device is added</strong><P>'."</br>";
 }
-else{echo'<P><strong> You can NOT add more buses</strong><P>';}
 }
 }
+}
+
 
 
 if (!empty($_POST['removesubmit'])) {
-
-$sql2=( "SELECT * FROM device WHERE CustomerID=$custID  AND DeviceSerial=$deviceSerial  ");
-$result = mysql_query($sql2);
-$num_rows = mysql_num_rows($result);
-//echo $num_rows;
-if ($num_rows == 0  ){
-echo'<P><strong> There is No device with this serial number</strong><P>';
-}
+$sqlup=( "SELECT * FROM devices WHERE uniqueid=$deviceSerial  ");
+$resultup = $db2->query($sqlup);
+  if($resultup == null  )
+{echo'<P><strong>There is No device with this serial number</strong><P>';}
 else{
-$sqlremove = ("DELETE FROM device WHERE CustomerID =$custID AND DeviceSerial =$deviceSerial ");
+
+$sqlremove = ("DELETE FROM devices WHERE uniqueid  ='$deviceSerial' ");
+$sqlremove = $db2->query($sqlremove);
+$sqlremove2 = ("DELETE FROM device WHERE DeviceUniqueID  ='$deviceSerial' ");
+$sqlremove2 = $db1->query($sqlremove2);
 $sqlremove1 = ("UPDATE customer SET 	NoOfBuses =(NoOfBuses-1)  WHERE CustomerID = $custID " );
-$resultremove = mysql_query($sqlremove);
-$resultremove1 = mysql_query($sqlremove1);
-echo '<P><strong> Bus is deleted</strong><P>'."</br>";
+$sqlremove = $db2->query($sqlremove);
+echo '<P><strong> device is deleted</strong><P>'."</br>";
 }
 }
 ?>
