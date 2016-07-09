@@ -30,9 +30,8 @@ if ($db2->connect_error) {
 } 
 $counter = $_GET["ID"];
 $LP = $_GET["LicensePlate"];
-//echo $counter;
 $LPL=rtrim($LP," </td");
-//echo $LPL ."<br>";
+
 
 $sqllink= ("SELECT * From Bus WHERE ID=$counter");
 $resultlink = $db1->query($sqllink);
@@ -75,11 +74,6 @@ print "<tr><th>Bus number</th><td>" . $row['BusNo'] . "</td></tr>";
 }
 
 
-
-//
-//print "</table>";
-//device
-//echo '<table class="table table-striped">';
  $sqljoin="SELECT * 
   From customer_side_db.bus INNER JOIN device_database.devices 
   ON customer_side_db.bus.DeviceUniqueId= device_database.devices.uniqueid
@@ -139,12 +133,12 @@ if($interval->format('%R%a days') >=  90 )
 {
 $tireErr='<font color="red">"You need to check your tires"</font>';
 }
-else{$tireErr=$interval->format('%R%a days');}
+else{$tireErr=$interval->format('%R%a days ago');}
 if($interval2->format('%R%a days') >=  90)
 {
 $maintenanceErr='<font color="red">"Your bus needs maintenance "</font>';
 }
-else{$maintenanceErr= $interval2->format('%R%a days');}
+else{$maintenanceErr= $interval2->format('%R%a days ago');}
 
 //processing bits
 $status12 =strchr($attr,"status");
@@ -165,12 +159,10 @@ $temp ="Temperature of engine is moderate";
 //status bit 11,10,9,8
 $sub2=substr($status1222,1,1);
 $sub2 =base_convert($sub2,16,2);
-//bit 11
-$sub2=substr($status1222,1,1);
-$sub2 =base_convert($sub2,16,2);
+
 if($sub2==1000 || $sub2==1001 || $sub2==1010 || $sub2==1011 || $sub2==1100 || $sub2==1101 || $sub2==1110 || $sub2==1111)
 {
-$accident= '<font color="red">"Your Bus made accident!"</font>';
+$accident= '<font color="red">"Your Bus made an accident!"</font>';
 }
 else
 {
@@ -188,11 +180,11 @@ $smoke ="Your bus is safe";
 //bit 9
 if($sub2==10 || $sub2==11 || $sub2==110 || $sub2==111 || $sub2==1010 || $sub2==1011 || $sub2==1110 || $sub2==1111 )
 {
-$Seatbelt= '<font color="red">"Drivers seatbelt is Not worn"</font>';
+$Seatbelt= '<font color="red">"brake fluid level is too low"</font>';
 }
 else
 {
-$Seatbelt ="Driver's seatbelt is worn";
+$Seatbelt ="brake fluid level is moderate";
 }
 //bit8
 if($sub2== 1 || $sub2== 11 || $sub2== 101|| $sub2== 111|| $sub2== 1001|| $sub2== 1011|| $sub2== 1101|| $sub2== 1111)
@@ -215,8 +207,6 @@ print "<tr><th>Fuel Level</th><td>" .$fuellevel."%". "</td></tr>";
 print "<tr><th>Oil Level</th><td>" . $oillevel. "%"."</td></tr>";
 print "</table>"; 
 echo '<table class="table table-striped">';
-if($row['BusStatus'] =='Not Working Correctly')
-{
 echo "<strong><h3>Bus Status : " . $row['BusStatus']."</strong></h3>"; 
 print "<tr><th>Speed </th><td>" . $SpeedErr. "</td></tr>";
 print "<tr><th>Fuel Level </th><td>" . $fuelErr. "</td></tr>";
@@ -226,13 +216,11 @@ print "<tr><th>Maintenance Date </th><td>" . trim($maintenanceErr,'+'). "</td></
 print "<tr><th>Engines' Temperatue </th><td>" . $temp. "</td></tr>";
 print "<tr><th>Accident status </th><td>" . $accident. "</td></tr>";
 print "<tr><th>Fire Status </th><td>" . $smoke. "</td></tr>";
-print "<tr><th>Seatbelt status</th><td>" . $Seatbelt. "</td></tr>";
+print "<tr><th>brake fluid level</th><td>" . $Seatbelt. "</td></tr>";// nzabat el seat belt wel ignition zay ma 3alaa 2al
 print "<tr><th>SOS button </th><td>" . $SOS. "</td></tr>";
 }
 }
-}
 print "</table>"; 
-
 
 ////
 echo '<table class="table table-striped">';
@@ -446,7 +434,7 @@ body {
                 </li>
                 <ul class="sub-menu collapse" id="new">
                  <a href="ownerhomeupdate.php"> <li>ADD/Remove bus</li>
-                 <a href="busstatus.php"> <li>Bus status and reports </li>
+                 <a href="busstatuscon.php"> <li>Bus status and reports </li>
                 
                 </ul>
 

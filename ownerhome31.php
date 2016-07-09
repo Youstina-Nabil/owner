@@ -234,10 +234,10 @@ body {
                         echo "<option>--</option> ";
                         echo '<option value="" disabled selected hidden></option> ';
 	
-$sql = "SELECT DISTINCT StationName FROM `stops`  INNER JOIN `bus` on stops.LicensePlate=bus.LicensePlate and stops.BusNo=bus.BusNo where  GrandCompanyName='$companyname' and OwnerUserName='$username' ";
+$sql = "SELECT DISTINCT BusStationName FROM `assigned_to` INNER JOIN  `busline`  on assigned_to.BusNo=busline.BusNo and assigned_to.BusLineName=busline.BusLineName where  CompanyName='$companyname' and OwnerUserName='$username' ";
 $query = mysql_query($sql);
 while($row = mysql_fetch_array($query))
-{	$x=$row['StopStation'];         
+{	$x=$row['BusStationName'];         
       echo "<option>$x</option> " ;
 }        
 echo '</select> <br>
@@ -253,13 +253,12 @@ echo "<option>--</option> ";
 echo '<option value="" disabled selected hidden> </option> ';
 
 
-
 					   
-$sql1 = "SELECT DISTINCT BusLine FROM `bus` where GrandCompanyName='$companyname' and OwnerUserName='$username' ";
+$sql1 = "SELECT * FROM  assigned_to  INNER JOIN  `busline`  on assigned_to.BusNo=busline.BusNo and assigned_to.BusLineName=busline.BusLineName where CompanyName='$companyname' and OwnerUserName='$username'  ";
 $query1 = mysql_query($sql1);
  if(!mysql_query($sql1)){die('Error :'.mysql_error());}
 while($row1 = mysql_fetch_array($query1))
-{	$bl=$row1['BusLine'];       					   
+{	$bl=$row1['BusLineName'];       					   
 	echo "<option>$bl</option> ";
 } 
 echo' </select> </div>';
@@ -278,7 +277,8 @@ if (empty($_POST['D1']))
    {
 $station = filter_input(INPUT_POST, 'D1');
 //$to = filter_input(INPUT_POST, 'D2');
-$sql2 = "SELECT DISTINCT * FROM `stops`  INNER JOIN `bus` on stops.LicensePlate=bus.LicensePlate and stops.BusNo=bus.BusNo where  GrandCompanyName='$companyname' and OwnerUserName='$username' and StationName = '$station' ";
+
+$sql2 = "SELECT DISTINCT * FROM `assigned_to` INNER JOIN  `busline`  on assigned_to.BusNo=busline.BusNo and assigned_to.BusLineName=busline.BusLineName where  CompanyName='$companyname' and OwnerUserName='$username' and BusStationName='$station' ";
     $query2 = mysql_query($sql2);
     if(!mysql_query($sql2)){die('Error :'.mysql_error());}
      while( $row2= mysql_fetch_array($query2)){
@@ -295,7 +295,8 @@ if (empty($_POST['D2']))
  else
    {
 $bl = filter_input(INPUT_POST, 'D2');
-$sql3 = "SELECT DISTINCT * FROM `bus` WHERE BusLine = '$bl' and  GrandCompanyName='$companyname' and OwnerUserName='$username'   ";
+
+$sql3 = "SELECT  * FROM  `busline` where BusLineName='$bl' and  CompanyName='$companyname' and OwnerUserName='$username'   ";
     $query3 = mysql_query($sql3);
     if(!mysql_query($sql3)){die('Error :'.mysql_error());}
      while( $row3= mysql_fetch_array($query3)){

@@ -136,6 +136,9 @@ $fuel2 =strchr($fuel1,",",1);
 $fuel =strchr($fuel2,":",0);
 $fuel =ltrim($fuel,':');
 $fuellevel= ((1024-$fuel)/1024)*100;
+//echo "level :".$fuellevel ;
+$sqlStatus = ("UPDATE bus SET FuelLevel =	$fuel where ID =$counter");//($Speed > $SpeedLimit)  ||
+$resultS = $db1->query($sqlStatus);
 
 //oil
 $oil1 =strchr($attr,"adc2");
@@ -144,10 +147,28 @@ $oil =strchr($oil2,":",0);
 $oil =ltrim($oil,':');
 $oillevel= ((1024-$oil)/1024)*100;
 
+//processing bits
+$status12 =strchr($attr,"status");
+$status122 =strchr($status12,",",1);
+$status1222 =strchr($status122,":",0);
+$status1222 =trim($status1222,':"');
+$sub1=substr($status1222,0,1);
+$sub1 =base_convert($sub1,16,2);
+//bit 12
+if($sub1== 1 || $sub1== 11 || $sub1== 101|| $sub1== 111|| $sub1== 1001|| $sub1== 1011|| $sub1== 1101|| $sub1== 1111)
+{
+$sqlStatussub1 = ("UPDATE bus SET BusStatus = 'Not Working Correctly' WHERE ID =$counter" );
+$resultsub1 =$db1->query($sqlStatussub1);
+}
+//bit 11,10,9,8
+$sub2=substr($status1222,1,1);
+$sub2 =base_convert($sub2,16,2);
+if($sub2== 01 ||$sub2== 10 ||$sub2== 11 ||$sub2== 100 ||$sub2== 101 ||$sub2== 110 ||$sub2== 111 ||$sub2== 1000 ||$sub2== 1001 ||$sub2== 1010 ||$sub2== 1011 ||$sub2== 1100 ||$sub2== 1101 ||$sub2== 1110 ||$sub2== 1111 )
+{
+$sqlStatussub2 = ("UPDATE bus SET BusStatus = 'Not Working Correctly' WHERE ID =$counter" );
+$resultsub2 =$db1->query($sqlStatussub2);
+}
 
-//echo "level :".$fuellevel ;
-$sqlStatus = ("UPDATE bus SET FuelLevel =	$fuel where ID =$counter");//($Speed > $SpeedLimit)  ||
-$resultS = $db1->query($sqlStatus);
 
 if($Speed > $SpeedLimit)
 {

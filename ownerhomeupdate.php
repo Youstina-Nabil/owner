@@ -26,6 +26,12 @@ $("#flip").click(function(){
 $("#flip1").click(function(){
 	$("#panel1").slideToggle("slow");
 });	
+$("#flip2").click(function(){
+	$("#panel2").slideToggle("slow");
+});
+$("#flip3").click(function(){
+	$("#panel3").slideToggle("slow");
+});	
 $(".edit_tr").click(function()
 {
 var ID=$(this).attr('id');
@@ -91,7 +97,7 @@ $(".text").show();
 });
 </script>
 <style>
-#panel, #flip ,#flip1, #panel1{
+#panel, #flip ,#flip1, #panel1,#flip2, #panel2,#flip3, #panel3{
 	color: black;
     padding: 5px;
     text-align: center;
@@ -99,7 +105,7 @@ $(".text").show();
     border: solid 1px #f3f3f3;
 }
 
-#panel, #panel1 {
+#panel, #panel1,#panel2,#panel3{
     padding: 50px;
     display: none;
 }
@@ -107,10 +113,11 @@ $(".text").show();
 <div class="col-lg-6"style="margin-top: 50" align="right" >
 
          <body>
-         	 <form name="own"  onsubmit="submitfn()"  method="post" >
-<table class="table table-striped">
-<tr>
+         <form name="own"  onsubmit="submitfn()"  method="post" >
+          <table class="table table-striped">
+          <tr>
           <th></th>
+		  <th>Bus Number</th>
           <th>License Plate</th>
 		  <th>Speed Limit</th>
 		  <th> Price of ticket</th>
@@ -118,27 +125,22 @@ $(".text").show();
           </tr>
 <?php
 include('config.php');
-session_start();$companyname=$_SESSION["cname"];$username=$_SESSION["username"]; 
+session_start();$companyname=$_SESSION["cname"];$username=$_SESSION["username"]; $custid=$_SESSION["id"];
 $sql=mysql_query("select * from bus where  CompanyName='$companyname' and OwnerUserName='$username'");
-//$id=1;	
-  if($sql ==null)
-{echo '<h4><strong>There is No buses in your fleet</strong></h4>';}
-else{
-echo "<h3><strong>Bus details</strong></h3>";
+//change here
 while($row=mysql_fetch_array($sql))
 { 
 $id=$row['ID'];
-//while($id!=$dd)
-//{ ini_set('max_execution_time', 300); $id++;}
-
-//$busno=$row['BusNo'];   
 $lp=$row['LicensePlate'];
+$sqlbn=mysql_query("select * from belongs_to where BusLicensePlate='$lp' ");if(!mysql_query("select * from belongs_to where BusLicensePlate='$lp' ")){die('Error :'.mysql_error());} while($rowbn=mysql_fetch_array($sqlbn)){$busno=$rowbn['BusNo']; }
+
 $sl=$row['SpeedLimit'];
 $price=$row['TicketPrice'];
 ?>
 <tr id="<?php echo $id; ?>" class="edit_tr">
  
 <td><input type="checkbox" name="removed[]" value= "<?php echo $lp; ?>"  ></td>
+<td><?php echo $busno; ?></td>
 <td><span value="<?php echo $lp; ?>"><?php echo $lp; ?></span></td>
 
 <td class="edit_td">
@@ -150,13 +152,7 @@ $price=$row['TicketPrice'];
 <span id="price_<?php echo $id; ?>" class="text"><?php echo $price; ?></span> 
 <input type="text" value="<?php echo $price; ?>" class="editbox" id="price_input_<?php echo $id; ?>"/>
 </td>
-<?php $sql5=mysql_query("SELECT  * FROM drives INNER JOIN driver ON driver.DriverID=drives.DriverId where BusLicensePlate='$lp' ");
-  if($sql5 ==null)
-{echo '<h4><strong>There is No driver for this bus in your fleet</strong></h4>';}
-else{
-//echo "<h3><strong>Bus details</strong></h3>";
-
-
+<?php $sql5=mysql_query("SELECT  * FROM drives INNER JOIN driver ON driver.DriverID=drives.DriverID where BusLicensePlate='$lp' ");
 if(mysql_num_rows($sql5)>0){
 while($row1=mysql_fetch_array($sql5))
 { $fname = $row1['FName'];
@@ -188,15 +184,17 @@ $lname=$row1['LName'];
 <?php	
 }
 }
-}
-}
 ?>
 </table>
 <button type="submit" value="Remove" name="submit" class="btn btn-danger ">Remove </button>
 </form>
 <div id="flip"><b>Click TO ADD NEW BUS</b></div>
 <div id="panel"><?php   error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
-require ('config.php'); 
+$dbh1 = mysql_connect("localhost", "root", ""); 
+$dbh2 = mysql_connect("localhost", "root", "", true); 
+mysql_select_db('serviceprovider_db', $dbh2);
+mysql_select_db('customer_side_db', $dbh1);
+
  echo'<style>select:required:invalid {
   color: #f3f3f3;
 }
@@ -209,51 +207,26 @@ option {
      <form method="post"  action="ownerhomeupdate.php">   
      <input type="text" id="LicensePlate" name="LicensePlate" placeholder="LicensePlate" step="1" required class="form-control">
 	 <input type="number" name="price"  placeholder="Ticket Price" step="1" required class="form-control"> 
-     <input type="number" name="bno" placeholder="Bus Number" step="1" required class="form-control">
-     <input type="text" name="bline" placeholder="Bus Line"  step="1" required class="form-control">
-	 <select required size="1" name="D2"  class="form-control"                        
-      <option>--</option><option value="" disabled selected hidden>  Geofence Id</option> ';
-	 $sqlgeo = "SELECT * FROM `geofence` where CompanyName='$companyname'  and UserName='$username'  ";
-     $querygeo = mysql_query($sqlgeo);
-     while($rowgeo = mysql_fetch_array($querygeo))
-     {	$gid=$rowgeo['GeofenceId'];         
-        echo "<option>$gid</option> " ;
-     }   
-	 echo' </select>
-	 <select required size="1" name="D3"  class="form-control"                        
-      <option>--</option><option value="" disabled selected hidden > Geofence Name</option> ';
-	 $sqlgn = "SELECT * FROM `geofence`where CompanyName='$companyname'  and UserName='$username' ";
-     $querygn = mysql_query($sqlgn);
-     while($rowgn = mysql_fetch_array($querygn))
-     {	$gn=$rowgn['GeofenceName'];         
-        echo "<option>$gn</option> " ;
-     }    
-	  
-	 echo' </select>
      <input type="number" name="speedlimit" placeholder="Speed Limit" step="1" required class="form-control">
-	 <input type="number" name="device" placeholder="Device Serial"  step="1" required class="form-control">
-	 <select required size="1" name="D4" class="form-control"                         
-          <option>--</option><option value="" disabled selected hidden> Driver Name</option> 	 ';
-     $sqldn = "SELECT * FROM `driver` ";
-     $querydn = mysql_query($sqldn);
-     while($rowdn = mysql_fetch_array($querydn))
-     {	$driverfname=$rowdn['FName'];         
-        $driverlname=$rowdn['LName']; 
-		//$driverid==$rowdn['DriverID'];
-        echo "<option> $driverfname $driverlname</option> " ;
-     }                           
- 
-     echo '  </select>
-     <select required size="1" name="D1"   class="form-control"                       
-          <option>--</option><option value="" disabled selected hidden> Bus Yard Name</option> 	 ';
-     $sql = "SELECT * FROM `busyard` ";
-     $query = mysql_query($sql);
-     while($row = mysql_fetch_array($query))
-     {	$busyard=$row['Name'];         
-        echo "<option>$busyard</option> " ;
-     }                           
- 
-     echo '  </select><br>
+	 <input type="number" name="bustype" placeholder="Bus Type"  step="1" required class="form-control">
+	 <select required size="1" name="device"                          
+     <option>--</option><option value="" disabled selected hidden> Device Unique Id</option> ';
+    
+		$sql_="SELECT  * from device where 	CustomerID='$custid' ";
+		$query_=mysql_query($sql_,$dbh2);
+        while ($row_ = mysql_fetch_array($query_))
+		{
+			$simcard=$row_['SIMPhoneNumber'];
+			$deviceid= $row_['DeviceUniqueID'];
+            $sqlcheckdevice="select LicensePlate from bus where DeviceUniqueID='$deviceid'"; 
+			 $querycheckdevice = mysql_query($sqlcheckdevice,$dbh1);
+			if(!mysql_query($sqlcheckdevice,$dbh1)){die('Error :'.mysql_error());} 
+			 if(mysql_num_rows($querycheckdevice)>0){}else{ echo "<option>$deviceid->$simcard</option> " ; } 
+		}
+	 
+	 
+	 echo'</select>
+	 	 <br>
    	 <input  type="submit" name="submit1" value="ADD" class="btn btn-danger"><br>  
                         </form>
 	
@@ -264,60 +237,33 @@ option {
       else{
 		   if(isset($_POST['LicensePlate']))
             {
-			    if (empty($_POST['D1'])) 
+			    if (empty($_POST['device'])) 
                    {
 	   
                    }
                 else
                 {
-                		 if (empty($_POST['D2'])){}else {		
-                                if (empty($_POST['D3'])){}else{ 
-                                          if (empty($_POST['D4'])){}else
+                		 if (empty($_POST['bustype'])){}else {		
+                                if (empty($_POST['price'])){}else{ 
+                                          if (empty($_POST['speedlimit'])){}else
 										                            { 								
               // $busid = $_POST['LicensePlate'];
      	       $LicensePlate=$_POST['LicensePlate'];
 		       $price=$_POST['price'];
-               $bno=$_POST['bno'];
-		       $bline=$_POST['bline'];
-		       $gid=filter_input(INPUT_POST, 'D2');
-		       $gname= filter_input(INPUT_POST, 'D3');
 		       $speedlimit=$_POST['speedlimit'];
-		       $busyard = filter_input(INPUT_POST, 'D1');
-			   $device=$_POST['device'];
-			   $drivername=filter_input(INPUT_POST, 'D4'); 
-		       $sql = "SELECT * FROM `bus` where LicensePlate='$LicensePlate' or DeviceSerial='$device' ";
-               $query = mysql_query($sql);
-               if(!mysql_query($sql)){die('Error :'.mysql_error());}  
+               $device=filter_input(INPUT_POST, 'device');list($unid, $phone) = explode("->", $device);echo $unid;
+		       $sql = "SELECT * FROM `bus` where LicensePlate='$LicensePlate' or DeviceUniqueId='$unid' ";
+               $query = mysql_query($sql,$dbh1);
+               if(!mysql_query($sql,$dbh1)){die('Error :'.mysql_error());}  
                if(mysql_num_rows($query)>0){echo'This Bus already exists';}
                else{
-				       /* $sqlcheck="SELECT * FROM `subaccount` where PW='$pwd'";
-					   $querycheck = mysql_query($sqlcheck);
-					   if(mysql_num_rows($querycheck)>0){echo 'Change your Password to be unique';}
-                       else{	 */	
-                        $driverflname = explode(" ", $drivername);
-                        $sqlget="SELECT * FROM `driver` where FName	='$driverflname[0]' and LName='$driverflname[1]'";
-					    $queryget = mysql_query($sqlget);
- 		                    while($rowget = mysql_fetch_array($queryget))
-                                  {	
-							           $driverid=$rowget['DriverID'];         
-                                  } 				
-			            $sql1 = "INSERT INTO `bus`(`LicensePlate`, `TicketPrice`, `GeofenceId`, `GeofenceName`, `SpeedLimit`,`BusCompanyName`,`GrandCompanyName`, `OwnerUserName`,  `DeviceSerial`) 
-				          VALUES ('$LicensePlate','$price','$gid','$gname','$speedlimit','Green','$companyname','$username','$busyard','$device')  ";
-                        
-						//$sql1="INSERT INTO `customer_side_db`.`bus` (`LicensePlate`, `BusNo`, `BusLine`, `BusCompanyName`, `GeofenceId`, `GeofenceName`, `Speed`, `SpeedLimit`, `GrandCompanyName`, `OwnerUserName`, `TireLastChangeDate`, `KmLeftForNextTireChange`, `LastMaintenceDate`, `Distance`, `BusStatus`, `FuelLevel`, `FuelCapacity`, `DeviceSerial`, `SimPhoneNo`, `CurrentLatitude`, `CurrentLongtitude`, `CurrentLocationTime`, `DeviceInstallationTime`, `DeviceResetTime`, `BusYardName`, `TicketPrice`) VALUES 
-						//( '$LicensePlate', '$bno', '$bline', 'Green', '12', 'goename', '76', '687', 'El Sakr', 'sakr', '', '', '', '', '', '', '', '4365468', '678789789', '', '', '', '', '', 'arab', '6');";
-						$sqlbusyard="INSERT INTO `busyard`(`BusyardName`) VALUES ($busyard)";
-						$querybusyard = mysql_query($sqlbusyard);
-                        if(!mysql_query($sqlbusyard)){die('Error :'.mysql_error());}
+				       
+                       	
+			            $sql1 = "INSERT INTO `bus`(`LicensePlate`, `TicketPrice`, `SpeedLimit`,`CompanyName`, `OwnerUserName` ,`DeviceUniqueId`,`SimPhoneNo`) 
+				          VALUES ('$LicensePlate','$price','$speedlimit','$companyname','$username','$unid','$phone')  ";
+						  if(!mysql_query($sql1,$dbh1)){die('Error :'.mysql_error());}
+						$query1 = mysql_query($sql1,$dbh1);
 						
-						
-						$query1 = mysql_query($sql1);
-                        if(!mysql_query($sql1)){die('Error :'.mysql_error());}
-						$sqldriver="INSERT INTO `drives`(`DriverID`,  `LicensePlate`) VALUES ('$driverid','$LicensePlate')";
-						$querydriver = mysql_query($sqldriver);
-                        if(!mysql_query($sqldriver)){die('Error :'.mysql_error());}
-                        
-					     //  }						
 							  } 		
 										                            }
 																}
@@ -325,8 +271,7 @@ option {
 				}
 		    }     
 	   } 
-	  // $sec = "10";
-	 //  header("Refresh: $sec; url=$page");
+
 	   ?></div>
 <br>
 	   <div id="flip1"><b>Click TO ADD NEW Yard</b></div>
@@ -344,7 +289,6 @@ option {
 }</style>
      <form method="post"  action="ownerhomeupdate.php">   
      <input type="text" id="name" name="name" placeholder="Name" step="1" required class="form-control">
-	 <input type="number" name="num"  placeholder="Number Of Buses" step="1" required class="form-control"> 
      <input type="submit" name="submit2" value="ADD" class="btn btn-danger"><br>  
                         </form>
 	 ';
@@ -354,19 +298,128 @@ option {
 		   if(isset($_POST['name']))
             {
 			$name=$_POST['name'];
-		    $num=$_POST['num'];	
-			$sqlcheck="SELECT * FROM `busyard` where Name='$name'";
+			$sqlcheck="SELECT * FROM `busyard` where BusyardName='$name'";
 					   $querycheck = mysql_query($sqlcheck);
 					   if(mysql_num_rows($querycheck)>0){echo 'this yard already exists';}
                        else{
 			
-			$sqlin="INSERT INTO `busyard`(`Name`, `NumberOfBuses`) VALUES ('$name','$num')";
+			$sqlin="INSERT INTO `busyard`(`BusyardName`) VALUES ('$name')";
             $queryin = mysql_query($sqlin);
             if(!mysql_query($sqlin)){die('Error :'.mysql_error());}
 					   }
 			}
 	  }
       ?></div>	   
+	  <br>
+	   <div id="flip2"><b>Click TO ADD NEW Line</b></div>
+       <div id="panel2"> <?php
+         error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
+        require ('config.php'); 
+ echo'<style>select:required:invalid {
+  color: #999;
+}
+option[value=""][disabled] {
+  display: none;
+}
+option {
+  color: black;
+}</style>
+     <form method="post"  action="ownerhomeupdate.php">   
+     <input type="text" id="name" name="name" placeholder="Bus Line Name" step="1" required class="form-control">
+	 <input type="text" id="num" name="num" placeholder="Bus Number" step="1" required class="form-control">
+     <input type="submit" name="submit3" value="ADD" class="btn btn-danger"><br>  
+                        </form>
+	 ';
+	 if(!isset($_POST['submit3']))
+       {  }
+      else{
+		   if(isset($_POST['name']))
+            {
+				if(isset($_POST['num']))
+                {
+			    $num=$_POST['num'];		
+			    $name=$_POST['name'];
+			    $sqlbl="SELECT * FROM `busline` where BusLineName='$name'";
+					   $querybl = mysql_query($sqlbl);
+					   if(mysql_num_rows($querybl)>0){/*echo 'this line already exists';*/}
+                       else{
+			
+			    $sqlbl1="INSERT INTO `busline`(`BusLineName`,`BusNo`,`CompanyName`, `OwnerUserName`) VALUES ('$name','$num','$companyname','$username')";
+                $querybl1 = mysql_query($sqlbl1);
+                if(!mysql_query($sqlbl1)){die('Error :'.mysql_error());}
+					       }
+				}
+			}
+	  }
+      ?></div><br>
+	  
+<div id="flip3"><b>Assigne Line to bus</b></div>
+       <div id="panel3"> <?php
+         error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
+        require ('config.php'); 
+ echo'<style>select:required:invalid {
+  color: #999;
+}
+option[value=""][disabled] {
+  display: none;
+}
+option {
+  color: black;
+}</style>
+     <form method="post"  action="ownerhomeupdate.php">   
+          <select required size="1" name="license"                          
+          <option>--</option><option value="" disabled selected hidden> License Plate</option> 	';
+		  
+		  $sqllp = "SELECT * FROM `bus` where CompanyName='$companyname' and OwnerUserName='$username' ";
+          $querylp = mysql_query($sqllp);
+          while($rowlp = mysql_fetch_array($querylp))
+          {	
+	       $license=$rowlp['LicensePlate'];
+          /*  $sqlcheck="SELECT * FROM `belongs_to` WHERE `BusLicensePlate`='$license'";
+           $querycheck = mysql_query($sqlcheck);
+           if(mysql_num_rows($querycheck)<=0)
+	    	{ */
+			echo "<option> $license</option> " ;
+	    	//}
+          }                              
+     echo ' 
+     	  </select>
+          <select required size="1" name="no"                          
+          <option>--</option><option value="" disabled selected hidden> Bus Line & Number</option>'; 	
+		  $sqlno = "SELECT * FROM `busline` where CompanyName='$companyname' and OwnerUserName='$username' ";
+          $queryno = mysql_query($sqlno);
+          while($rowno = mysql_fetch_array($queryno))
+          {	$busline=$rowno['BusLineName'];
+	       $busno=$rowno['BusNo'];
+		   echo "<option>$busline $busno</option> " ;
+          }   
+		  
+		  
+	 echo ' 
+     	  </select>	  
+		  
+	<input type="submit" name="submit4" value="ADD" class="btn btn-danger"><br>  
+                        </form>
+	 ';
+	 if(!isset($_POST['submit4']))
+       {  }
+      else{
+		   if(isset($_POST['license']))
+            {
+				if(isset($_POST['no']))
+                {			
+			    $license=filter_input(INPUT_POST, 'license');
+			    $num=filter_input(INPUT_POST, 'no');
+				$num1 = explode(" ", $num);
+			    $sqlbl1="INSERT INTO `belongs_to`(`BusLineName`, `BusNo`, `BusLicensePlate`) VALUES ('$num1[0]','$num1[1]','$license')";
+                $querybl1 = mysql_query($sqlbl1);
+               // if(!mysql_query($sqlbl1)){die('Error :'.mysql_error());}
+					       
+				}
+			}
+	  }
+      ?></div>	   	  
+	  
 <?php
 error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
 require ('config.php'); 
@@ -380,13 +433,13 @@ if (empty($_POST['removed']))
 else
     { 	
 	    foreach($_POST['removed'] as $selected) {
-		$sql5="DELETE FROM `drives` WHERE `LicensePlate` = '$selected' ";	
+		$sql5="DELETE FROM `drives` WHERE `BusLicensePlate` = '$selected' ";	
 		$query5=mysql_query($sql5);
 		if(!mysql_query($sql5)){die('Error :'.mysql_error());}
-		$sql4 = "DELETE FROM `stops` WHERE LicensePlate= '$selected' ";
+		$sql4 = "DELETE FROM `belongs_to` WHERE BusLicensePlate= '$selected' ";
         $query4 = mysql_query($sql4);
         if(!mysql_query($sql4)){die('Error :'.mysql_error());}
-		$sql3 = "DELETE FROM `bus` WHERE `LicensePlate` = '$selected' and GrandCompanyName='$companyname' and OwnerUserName='$username' ";
+		$sql3 = "DELETE FROM `bus` WHERE `LicensePlate` = '$selected' and CompanyName='$companyname' and OwnerUserName='$username' ";
         $query3 = mysql_query($sql3);
         if(!mysql_query($sql3)){die('Error :'.mysql_error());}
        			
@@ -394,8 +447,7 @@ else
 				
 	                                             }              
 	}
-//header ('Location: ' . $_SERVER['REQUEST_URI']);
- //   exit();
+
 }
 
 
