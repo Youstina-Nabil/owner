@@ -20,7 +20,7 @@ session_start();
 <table class="table table-striped">
  
 <?php
-$db1 = new mysqli('localhost','root','','customer_side_db');
+  $db1 = new mysqli('localhost','root','','customer_side_db');
   $db2 = new mysqli('localhost','root','','device_database');
 if ($db1->connect_error) {
     die("Connection failed: " . $db1->connect_error);
@@ -33,7 +33,6 @@ $LP = $_GET["LicensePlate"];
 //echo $counter;
 $LPL=rtrim($LP," </td");
 //echo $LPL ."<br>";
-
 $sqllink= ("SELECT * From Bus WHERE ID=$counter");
 $resultlink = $db1->query($sqllink);
   if($resultlink ==null)
@@ -45,28 +44,25 @@ while($row = $resultlink->fetch_assoc())
 print "<tr><th>License Plate </th><td>" . $row['LicensePlate'] . "</td></tr>"; 
 print "<tr><th>Bus type </th><td>" . $row['BusType'] . "</td></tr>"; 
 //print "<tr><th>Geofence Name </th><td>" . $row['GeofenceName'] . "</td></tr>";
-//print "<tr><th>Speed </th><td>" . $row['Speed'] . "</td></tr>";
 print "<tr><th>Speed Limit </th><td>" . $row['SpeedLimit'] . "</td></tr>";
 print "<tr><th>Tire Last Change Date </th><td>" . $row['TireLastChangeDate'] . "</td></tr>";
 print "<tr><th>Last Maintence Date </th><td>" . $row['LastMaintenanceDate'] . "</td></tr>";
 print "<tr><th>Bus Status </th><td>" . $row['BusStatus'] . "</td></tr>";
-
 print "<tr><th>Sim Phone No </th><td>" . $row['SimPhoneNo'] . "</td></tr>";
-//print "<tr><th>Latitude </th><td>" . $row['CurrentLatitude'] . "</td></tr>";
-//print "<tr><th>Longtitude </th><td>" . $row['CurrentLongtitude'] . "</td></tr>";
-//print "<tr><th>Current Location Time </th><td>" . $row['CurrentLocationTime'] . "</td></tr>";
 print "<tr><th>Device Installation Time </th><td>" . $row['DeviceInstallationTime'] . "</td></tr>";
 print "<tr><th>Device Reset Time </th><td>" . $row['DeviceResetTime'] . "</td></tr>";
-//print "<tr><th>Bus Yard Name  </th><td>" . $row['BusYardName'] . "</td></tr>";
 } 
 }
-$sqlyard= ("SELECT BusyardName From contain WHERE BusLicensePlate='$LPL'");
+//bus yard
+$sqlyard= ("SELECT * From contain WHERE BusLicensePlate='$LPL'");
 $resultyard = $db1->query($sqlyard);
+//echo $LPL;
   if($resultyard ==null)
 {echo '<h4><strong>There is No assigned Yard for this bus in your fleet</strong></h4>';}
 else{
 while($row = $resultyard->fetch_assoc()) 
 { 
+//echo "hi";
 print "<tr><th>Yard Name</th><td>" . $row['BusyardName'] . "</td></tr>"; 
 }
 }
@@ -74,7 +70,7 @@ print "<tr><th>Yard Name</th><td>" . $row['BusyardName'] . "</td></tr>";
 $sqlb= ("SELECT * From belongs_to WHERE BusLicensePlate='$LPL'");
 $resultb = $db1->query($sqlb);
   if($resultb ==null)
-	  {echo '<h4><strong>There is No assigned Yard for this bus in your fleet</strong></h4>';}
+{echo '<h4><strong>There is No assigned Yard for this bus in your fleet</strong></h4>';}
 else{
 while($row = $resultb->fetch_assoc()) 
 { 
@@ -82,9 +78,6 @@ print "<tr><th>Bus Line Name</th><td>" . $row['BusLineName'] . "</td></tr>";
 print "<tr><th>Bus number</th><td>" . $row['BusNo'] . "</td></tr>"; 
 }
 }
-
-
-
 //
 //print "</table>";
 //device
@@ -111,7 +104,6 @@ $fuel =strchr($fuel2,":",0);
 $fuel =ltrim($fuel,':');
 $fuellevel= ((1024-$fuel)/1024)*100;
 //oil
-
 $oil1 =strchr($attr,"adc2");
 //echo $fuel1;
 $oil2 =strchr($oil1,",",1);
@@ -129,6 +121,7 @@ print "<tr><th>Oil Level</th><td>" . $oillevel. "%"."</td></tr>";
 }
 }
 print "</table>"; 
+////
 echo '<table class="table table-striped">';
  $sql="SELECT * 
   From drives , driver
@@ -138,7 +131,8 @@ echo '<table class="table table-striped">';
 {echo '<strong><h4>There is No drivers assigned for this bus in your fleet</strong></h4>';}
 else{
 echo "<h3><strong>Driver information</strong></h3>";
-  while($row = $result->fetch_assoc()) { 
+  while($row = $result->fetch_assoc()) 
+{ 
 print "<tr><th>Driver ID</th><td>" . $row['DriverID'] . "</td></tr>"; 
 print "<tr><th>First Name </th><td>" . $row['FName'] . "</td></tr>"; 
 print "<tr><th>Last Name </th><td>" . $row['LName'] . "</td></tr>";
@@ -150,7 +144,6 @@ print "<tr><th>Shift</th><td>" . $row['Shift'] . "</td></tr>";
 }
 }
 print "</table>"; 
-
 ?>
 </div>
 <div class="col-lg-3"></div>
@@ -338,7 +331,7 @@ body {
                   <i class="fa fa-car fa-lg"></i> My Busses <span class="arrow"></span></a>
                 </li>
                 <ul class="sub-menu collapse" id="new">
-                 <a href="ownerhomeupdate.php"> <li>ADD/Remove bus</li>
+                 <a href="ownerhomeupdate.php"> <li><Edit my fleet/li>
                  <a href="busstatus.php"> <li>Bus status and reports </li>
                 
                 </ul>
@@ -351,9 +344,22 @@ body {
                   <i class="fa fa-users fa-lg"></i> Managers
                   </a>
                 </li>
+				
+				
+                 <li>
+                     <a href="ownerhome41.php ">
+                  <i class="fa fa-users fa-lg"></i> Drivers
+                  </a>
+                </li>
+				
                  <li>
                   <a href="ownerhome31.php">
                   <i class="glyphicon glyphicon-search"></i> search Busses
+                  </a>
+                  </li>
+				   <li>
+                  <a href="#">
+                  <i class="glyphicon glyphicon-wrench"></i> commands
                   </a>
                   </li>
             </ul>

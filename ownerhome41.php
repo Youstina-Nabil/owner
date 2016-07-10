@@ -104,26 +104,25 @@ $(".text").show();
 </style>
          <body>
          
-<form name="own" action="ownerhome21.php" onsubmit="submitfn()"  method="post">
+<form name="own" action="ownerhome41.php" onsubmit="submitfn()"  method="post">
               <div class="col-lg-3"></div>
 	<div class="col-lg-6" " > 
      
     <table class="table table-striped" style="margin-top: 50">
 		  <tr>
             <th></th>		  
-		    <th>Manager Name</th>
-            <th>Manager ID</th>
-			<th>Manager Email</th>
+		    <th>Driver Name</th>
+            <th>Driver ID</th>
 		    <th> Phone </th>
 		    <th>  City</th>
 		    <th>  Street</th>
-		    <th colspan=10> Assigned Bus Lines</th>
+		    <th > Assigned Bus </th>
 		 </tr>
 <?php
 session_start();
 error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
 require ('config.php');$companyname=$_SESSION["cname"];$username=$_SESSION["username"]; 
-$sql = "SELECT * FROM `manager` where  CompanyName='$companyname' and OwnerUserName='$username' ";
+$sql = "SELECT * FROM `driver` where  CompanyName='$companyname' and OwnerUserName='$username' ";
 $query = mysql_query($sql);
 if(!mysql_query($sql)){die('Error :'.mysql_error());}
 
@@ -131,30 +130,27 @@ if(!mysql_query($sql)){die('Error :'.mysql_error());}
 //$id=0;
 while($row = mysql_fetch_array($query))
 {
-$fname=$row['ManagerFName'];
-$lname=$row['ManagerLName'] ;	
-$mi=$row['ManagerId']; 	
-$id=$row['SubAccountId'];
-$me=$row['ManagerEmail']; 
-$mp=$row['ManagerPhoneNo'];
-$mc=$row['ManagerCity'];
-$ms=$row['ManagerStreet'];
+$fname=$row['FName'];
+$lname=$row['LName'] ;	
+$id=$row['DriverID']; 	
+$mp=$row['PhoneNo'];
+$mc=$row['City'];
+$ms=$row['Street'];
 ?>		  
 <tr id="<?php echo $id; ?>" class="edit_tr">
 <td><input type="checkbox" name="removed[]" value= "<?php echo $id; ?>"  ></td>                    		    
 <td class="table"><div><?php echo $fname; ?>  <?php echo $lname; ?></div></td>
- <td><div ><?php echo $mi; ?></div></td>
- <td><div><?php echo $me; ?></div></td>
+ <td><div ><?php echo $id; ?></div></td>
  <td><div ><?php echo $mp; ?></div></td> 
  <td><div><?php echo $mc; ?></div></td>
  <td><div><?php echo $ms; ?></div></td>
 	
 <?php	
-$sql1 = "SELECT  * FROM edit where SubAccountId=$id" ;
+$sql1 = "SELECT  * FROM drives where DriverId=$id" ;
 $query1 = mysql_query($sql1);           
 if(!mysql_query($sql1)){die('Error :'.mysql_error());}
 while($row1 = mysql_fetch_array($query1))
-{ $bl=$row1['BusLineName'];
+{ $bl=$row1['BusLicensePlate'];
 	
 ?>	
 
@@ -175,9 +171,9 @@ while($row1 = mysql_fetch_array($query1))
              <div class="col-lg-6" align="right">
  
  </table >
- <button type="submit" value="Remove " name="submit" class="btn btn-danger form-control">Remove Manager</button>
+ <button type="submit" value="Remove " name="submit" class="btn btn-danger form-control">Remove Driver</button>
  </form> 
- <div id="flip" align="center"> ADD  Manager</div>
+ <div id="flip" align="center"> ADD  Driver</div>
 
  
  <div id="panel"><?php  error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
@@ -191,16 +187,15 @@ option[value=""][disabled] {
 option {
   color: black;
 }</style>
-     <form method="post"  action="ownerhome21.php">   
-     <input type="number" name="AccountId"  placeholder="Account ID"  step="1" required class="form-control" >
-     <input type="password" id="pwd" name="pwd" placeholder="Initial Password" step="1" required class="form-control">
+     <form method="post"  action="ownerhome41.php">   
 	 <input type="text" name="fname"  placeholder="First Name" step="1" required class="form-control"> 
      <input type="text" name="lname" placeholder="Last Name" step="1" required class="form-control">
      <input type="number" name="id" placeholder="ID"  step="1" required class="form-control">
      <input type="number" name="pno" placeholder="Phone Number" step="1" required class="form-control">
-     <input type="text" name="email" placeholder="E-mail " step="1" required class="form-control">
      <input type="text" name="city" placeholder="City" step="1" required class="form-control">
      <input type="text" name="street" placeholder="Street "  step="1" required class="form-control">
+     <input type="text" name="license" placeholder="Driving License Number "  step="1" required class="form-control">
+
 	 <br>
 	 <input type="submit" name="submit1" value="ADD" class="btn btn-danger"><br>  
                         </form> </div>
@@ -210,15 +205,13 @@ option {
      if(!isset($_POST['submit1']))
        {  }
       else{
-		   if(isset($_POST['pwd']))
+		   if(isset($_POST['id']))
              {
-               $pwd = $_POST['pwd'];
-     	       $accid=$_POST['AccountId'];
+               $license=$_POST['license'];
 		       $fname=$_POST['fname'];
                $lname=$_POST['lname'];
 		       $ssn=$_POST['id'];
 		       $num=$_POST['pno'];
-		       $email=$_POST['email'];
 		       $city=$_POST['city'];
 		       $street=$_POST['street'];
 			   $yardname= filter_input(INPUT_POST, 'D1');// echo $accid ; echo $yardname;	
@@ -227,13 +220,13 @@ option {
                if(!mysql_query($sql)){die('Error :'.mysql_error());}  
                if(mysql_num_rows($query)>0){/*echo'This manager already exists';*/}
                else{
-				       $sqlcheck="SELECT * FROM `manager` where PW='$pwd'";
+				       $sqlcheck="SELECT * FROM `driver` where DriverID='$ssn'";
 					   $querycheck = mysql_query($sqlcheck);
-					   if(mysql_num_rows($querycheck)>0){echo 'Change your Password to be unique';}
+					   if(mysql_num_rows($querycheck)>0){/*/////////////*/}
                        else{		
 						//   $sqlin="INSERT INTO `supervise` (`AccountId`, `YardName`) VALUES ( $accid, '$yardname') ";
-						   $sql1 = "INSERT INTO `manager`(`SubAccountId`, `PW`, `CompanyName`, `OwnerUserName`, `ManagerFName`, `ManagerLName`, `ManagerId`, `ManagerEmail`, `ManagerPhoneNo`, `ManagerStreet`, `ManagerCity`) 
-				           VALUES ('$accid','$pwd','$companyname','$username','$fname','$lname','$ssn','$email','$num','$street','$city')  ";
+						   $sql1 = "INSERT INTO `driver`(`DriverID`, `FName`, `LName`, `City`, `Street`, `DrivingLicenseNo`,`PhoneNo`, `CompanyName`, `OwnerUserName`) 
+						   VALUES  ('$ssn','$fname','$lname','$city','$street','$license','$num','$companyname','$username')  ";
                            $query1 = mysql_query($sql1);
                         //   $queryin = mysql_query($sqlin);
 						//   if(!mysql_query($sqlin)){die('Error :'.mysql_error());}                  
@@ -246,7 +239,7 @@ option {
        
 	   ?>
 	   <br>
-	   <div id="flip3">Assigne Manager to Line</div>
+	   <div id="flip3">Change bus assigned to driver</div>
        <div id="panel3"> <?php
          error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
         require ('config.php'); 
@@ -261,7 +254,7 @@ option {
 }</style>
      <form method="post"  action="ownerhome21.php">   
           <select required size="1" name="name"                          
-          <option>--</option><option value="" disabled selected hidden> Manager Name</option> 	';
+          <option>--</option><option value="" disabled selected hidden> Driver Name</option> 	';
 		  
 		  $sqlname = "SELECT * FROM `manager` where CompanyName='$companyname' and OwnerUserName='$username' ";
           $queryname = mysql_query($sqlname);
@@ -275,7 +268,7 @@ option {
      echo ' 
      	  </select>
           <select required size="1" name="no"                          
-          <option>--</option><option value="" disabled selected hidden> Bus Line & Number</option>'; 	
+          <option>--</option><option value="" disabled selected hidden> Bus license plate</option>'; 	
 		  $sqlno = "SELECT * FROM `busline` where CompanyName='$companyname' and OwnerUserName='$username' ";
           $queryno = mysql_query($sqlno);
           while($rowno = mysql_fetch_array($queryno))
@@ -550,15 +543,15 @@ body {
                   <i class="fa fa-users fa-lg"></i> Managers
                   </a>
                 </li>
-                 
-				 
+				
+				
                  <li>
                      <a href="ownerhome41.php ">
                   <i class="fa fa-users fa-lg"></i> Drivers
                   </a>
                 </li>
-				 
-				 <li>
+				
+                 <li>
                   <a href="ownerhome31.php">
                   <i class="glyphicon glyphicon-search"></i> search Busses
                   </a>

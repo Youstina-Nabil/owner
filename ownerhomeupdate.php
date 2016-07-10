@@ -31,6 +31,9 @@ $("#flip2").click(function(){
 });
 $("#flip3").click(function(){
 	$("#panel3").slideToggle("slow");
+});
+$("#flip4").click(function(){
+	$("#panel4").slideToggle("slow");
 });	
 $(".edit_tr").click(function()
 {
@@ -97,7 +100,7 @@ $(".text").show();
 });
 </script>
 <style>
-#panel, #flip ,#flip1, #panel1,#flip2, #panel2,#flip3, #panel3{
+#panel, #flip ,#flip1, #panel1,#flip2, #panel2,#flip3, #panel3,#flip4, #panel4{
 	color: black;
     padding: 5px;
     text-align: center;
@@ -105,7 +108,7 @@ $(".text").show();
     border: solid 1px #f3f3f3;
 }
 
-#panel, #panel1,#panel2,#panel3{
+#panel, #panel1,#panel2,#panel3,#panel4{
     padding: 50px;
     display: none;
 }
@@ -119,6 +122,7 @@ $(".text").show();
           <th></th>
 		  <th>Bus Number</th>
           <th>License Plate</th>
+           <th>device Password</th>
 		  <th>Speed Limit</th>
 		  <th> Price of ticket</th>
           <th colspan=2>Driver Name</th> 	       
@@ -209,8 +213,9 @@ option {
 	 <input type="number" name="price"  placeholder="Ticket Price" step="1" required class="form-control"> 
      <input type="number" name="speedlimit" placeholder="Speed Limit" step="1" required class="form-control">
 	 <input type="number" name="bustype" placeholder="Bus Type"  step="1" required class="form-control">
-	 <select required size="1" name="device"                          
-     <option>--</option><option value="" disabled selected hidden> Device Unique Id</option> ';
+         <input type="number" name="bustype" placeholder="Device password"  step="1" required class="form-control">
+	 <select required size="1" name="device" class="form-control"                         
+     <option>--</option><option value="" disabled selected hidden> Device Unique Id->SIMCardNumber</option> ';
     
 		$sql_="SELECT  * from device where 	CustomerID='$custid' ";
 		$query_=mysql_query($sql_,$dbh2);
@@ -327,7 +332,7 @@ option {
      <form method="post"  action="ownerhomeupdate.php">   
      <input type="text" id="name" name="name" placeholder="Bus Line Name" step="1" required class="form-control">
 	 <input type="text" id="num" name="num" placeholder="Bus Number" step="1" required class="form-control">
-     <input type="submit" name="submit3" value="ADD" class="btn btn-danger"><br>  
+     <input type="submit" name="submit3"  value="ADD" class="btn btn-danger"><br>  
                         </form>
 	 ';
 	 if(!isset($_POST['submit3']))
@@ -337,21 +342,68 @@ option {
             {
 				if(isset($_POST['num']))
                 {
-			    $num=$_POST['num'];		
-			    $name=$_POST['name'];
-			    $sqlbl="SELECT * FROM `busline` where BusLineName='$name'";
+			     $num=$_POST['num'];		
+			     $name=$_POST['name'];
+			     $sqlbl="SELECT * FROM `busline` where BusLineName='$name'";
 					   $querybl = mysql_query($sqlbl);
 					   if(mysql_num_rows($querybl)>0){/*echo 'this line already exists';*/}
                        else{
-			
-			    $sqlbl1="INSERT INTO `busline`(`BusLineName`,`BusNo`,`CompanyName`, `OwnerUserName`) VALUES ('$name','$num','$companyname','$username')";
-                $querybl1 = mysql_query($sqlbl1);
-                if(!mysql_query($sqlbl1)){die('Error :'.mysql_error());}
-					       }
+			     $sqlbl1="INSERT INTO `busline`(`BusLineName`,`BusNo`,`CompanyName`, `OwnerUserName`) VALUES ('$name','$num','$companyname','$username')";
+                 $querybl1 = mysql_query($sqlbl1);
+                 if(!mysql_query($sqlbl1)){/*die('Error :'.mysql_error());*/} //mysql_free_result($querybl1);   
+						 //  header("Location:draw.php"); 
+						   
+						   }
 				}
 			}
 	  }
       ?></div><br>
+	   <div id="flip4"><b>Draw Geofence For Bus Line</b></div>
+       <div id="panel4"> <?php
+         error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
+        require ('config.php'); 
+ echo'<style>select:required:invalid {
+  color: #999;
+}
+option[value=""][disabled] {
+  display: none;
+}
+option {
+  color: black;
+}</style>
+     <form method="post"  action="draw.php">   
+<select required size="1" name="buslineno"                          
+          <option>--</option><option value="" disabled selected hidden> Bus Line & Number</option>'; 	
+		  $sqlno = "SELECT * FROM `busline` where CompanyName='$companyname' and OwnerUserName='$username' ";
+          $queryno = mysql_query($sqlno);
+          while($rowno = mysql_fetch_array($queryno))
+          {	$busline=$rowno['BusLineName'];
+	       $busno=$rowno['BusNo'];
+		   echo "<option>$busline->$busno</option> " ;
+          }   
+		  
+		  
+	 echo ' 
+     	  </select>	  
+     <input type="submit" name="submit5"  value="GO" class="btn btn-danger"><br>  
+                        </form>
+	 ';
+	 if(!isset($_POST['submit5']))
+       {  }
+      else{
+		   if(isset($_POST['buslineno']))
+            {
+			    $num=filter_input(INPUT_POST, 'buslineno');
+				$num1 = explode("->", $num);
+                       
+			     
+					        $_SESSION["Redraw_Bus_line_name"] = $num1[0];  $_SESSION["Redraw_Bus_No"] = $num1[1]; 
+						 //  echo $num1[0];
+						   
+				
+			}
+	  }
+      ?></div><br> 
 	  
 <div id="flip3"><b>Assigne Line to bus</b></div>
        <div id="panel3"> <?php
@@ -640,8 +692,8 @@ body {
                   <i class="fa fa-car fa-lg"></i> My Busses <span class="arrow"></span></a>
                 </li>
                 <ul class="sub-menu collapse" id="new">
-                 <a href="ownerhomeupdate.php"> <li>ADD/Remove bus</li>
-                 <a href="busstatus.php"> <li>Bus status and reports </li>
+                 <a href="ownerhomeupdate.php"> <li>Edit my fleet</li>
+                 <a href="busstatuscon.php"> <li>Bus status and reports </li>
                 
                 </ul>
 
@@ -653,9 +705,23 @@ body {
                   <i class="fa fa-users fa-lg"></i> Managers
                   </a>
                 </li>
+				
+				
+                 <li>
+                     <a href="ownerhome41.php ">
+                  <i class="fa fa-users fa-lg"></i> Drivers
+                  </a>
+                </li>
+				
+				
                  <li>
                   <a href="ownerhome31.php">
                   <i class="glyphicon glyphicon-search"></i> search Busses
+                  </a>
+                  </li>
+                  <li>
+                  <a href="ownerhome51.php">
+                  <i class="glyphicon glyphicon-wrench"></i> commands
                   </a>
                   </li>
             </ul>

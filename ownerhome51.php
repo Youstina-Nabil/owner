@@ -1,25 +1,139 @@
- <?php
- session_start();
-
-error_reporting(E_ALL ^ E_DEPRECATED &~E_NOTICE);
-require ('config.php');
-$companyname=$_SESSION["cname"];$username=$_SESSION["username"]; 
-
-
-echo 
-'
-<html>
-
-    <head>
-    <img  src="images/gr.png" class="img-responsive"   style="position:fixed;top:0px;left:0px;width:100%;height:100%;z-index:-1;" >
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Vehicle Tracking Systtem</title>
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<img  src="images/gr.png" class="img-responsive"   style='position:fixed;top:0px;left:0px;width:100%;height:100%;z-index:-1;' >
+<title>Fleet Tracking System</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  
+<html>
+    
+    <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Vehicle Tracking Systtem</title>
+	<link rel="stylesheet" href="ownerstyle.css" type="text/css">
 	</head>
+	
         
-  <head>
+        
+        
+	     <script type="text/javascript" src="http://ajax.googleapis.com/
+ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function()
+{
+$("#flip").click(function(){
+        $("#panel").slideToggle("slow");
+    });	
+$("#flip1").click(function(){
+	$("#panel1").slideToggle("slow");
+});	
+$("#flip2").click(function(){
+	$("#panel2").slideToggle("slow");
+});
+$("#flip3").click(function(){
+	$("#panel3").slideToggle("slow");
+});		
+$(".edit_tr").click(function()
+{
+var ID=$(this).attr('id');
+$("#by_"+ID).hide();
+$("#by_input_"+ID).show();
+
+
+}).change(function()
+{
+var ID=$(this).attr('id');
+var by=$("#by_input_"+ID).val();
+
+
+//var LP=$("#lp_"+ID).val();
+var dataString = 'id='+ ID +'&by='+by;
+$("#by_"+ID).html('<img src="load.gif" />'); // Loading image
+
+if(by.length>0)
+{
+
+
+$.ajax({
+type: "POST",
+url: "managerupdate_edit_ajax.php",
+data: dataString,
+cache: false,
+success: function(html)
+{
+$("#by_"+ID).html(by);
+
+}
+});
+}
+else
+{
+alert('Enter something.');
+}
+
+});
+
+// Edit input box click action
+$(".editbox").mouseup(function() 
+{
+return false
+});
+
+// Outside click action
+$(document).mouseup(function()
+{
+$(".editbox").hide();
+$(".text").show();
+});
+});
+</script>
+<style>
+#panel, #flip ,#flip1, #panel1,#flip2, #panel2,#flip3, #panel3{
+	color: black;
+    padding: 5px;
+    text-align: center;
+    background-color: #f3f3f3;
+    border: solid 1px #f3f3f3;
+}
+
+#panel, #panel1,#panel2,#panel3{
+    padding: 50px;
+    display: none;
+}
+</style>
+         <body>
+         
+
+                <div class="col-lg-3"></div>
+	            <div class="col-lg-6" > 
+	            <div class="container-fluid" style="margin-top: 100px">
+                <div class="container">  
+	            <div class="container text-center">
+                <h2 style="margin:auto">Commands</h2>
+                <p><br></p>
+                </div>
+	
+<p> Track by SMS</p><span><p>Command: W******,000</p></span>
+Description: Get the current location of the tracker, send this SMS or make a telephone call directly to the tracker and it will report its longitude and latitude by SMS with format as follows:-
+Latitude = 22 32 36.63N Longitude = 114 04 57.37E, Speed = 2.6854Km/h, 2008-12-24,01:50
+Example:
+W000000,000   
+	   
+	  
+
+
+	             </div></div> 
+	          </div>
+              <div class="col-lg-3"></div>
+
+
+</body>
+</html>
+
+<html>
+    
+    <head>
         
         <style>.nav-side-menu {
   overflow: auto;
@@ -170,7 +284,7 @@ body {
         
         
     </head>
-<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
 <div class="nav-side-menu">
     <div class="brand"><b>Tracking system </div>
@@ -199,7 +313,7 @@ body {
                   <i class="fa fa-car fa-lg"></i> My Busses <span class="arrow"></span></a>
                 </li>
                 <ul class="sub-menu collapse" id="new">
-                 <a href="ownerhomeupdate.php"> <li>Edit your fleet</li>
+                 <a href="ownerhomeupdate.php"> <li>Edit my fleet</li>
                  <a href="busstatuscon.php"> <li>Bus status and reports </li>
                 
                 </ul>
@@ -212,115 +326,25 @@ body {
                   <i class="fa fa-users fa-lg"></i> Managers
                   </a>
                 </li>
+                 
+				 
                  <li>
+                     <a href="ownerhome41.php ">
+                  <i class="fa fa-users fa-lg"></i> Drivers
+                  </a>
+                </li>
+				 
+				 <li>
                   <a href="ownerhome31.php">
                   <i class="glyphicon glyphicon-search"></i> search Busses
+                  </a>
+                  </li>
+				   <li>
+                  <a href="ownerhome51.php">
+                  <i class="glyphicon glyphicon-wrench"></i> commands
                   </a>
                   </li>
             </ul>
      </div>
 </div
-
-
-
-         <body>
-         <div class="row"> <div class="col-md-3"></div>   
-        <div class="col-md-6">    <div class="panel panel-default" style="margin-top:50 ">
-               <div class="panel-heading"><b>Search</b></div>
-               <div class="panel-body" > 
-			   
-               <form action="ownerhome31.php" onsubmit="submitfn()"  method="post" >
-         <div class="col-sm-3" align=right>      Filter By Station</div> <div class="col-sm-6"> <select size="1" name="D1" placeholder="One Station"class="form-control";';
-                        echo "<option>--</option> ";
-                        echo '<option value="" disabled selected hidden></option> ';
-	
-$sql = "SELECT DISTINCT BusStationName FROM `assigned_to` INNER JOIN  `busline`  on assigned_to.BusNo=busline.BusNo and assigned_to.BusLineName=busline.BusLineName where  CompanyName='$companyname' and OwnerUserName='$username' ";
-$query = mysql_query($sql);
-while($row = mysql_fetch_array($query))
-{	$x=$row['BusStationName'];         
-      echo "<option>$x</option> " ;
-}        
-echo '</select> <br>
-    </div>
-<div class="col-sm-3">
-<input type="submit" name="submit" value="Find" class="btn btn-danger  " ></div><br><br> <br>  
-
-<div class="col-sm-3" align=right>  
-Filter By Line </div>
-<div class="col-sm-6">
-	<select size="1" name="D2" class="form-control";';
-echo "<option>--</option> ";
-echo '<option value="" disabled selected hidden> </option> ';
-
-
-					   
-$sql1 = "SELECT * FROM  assigned_to  INNER JOIN  `busline`  on assigned_to.BusNo=busline.BusNo and assigned_to.BusLineName=busline.BusLineName where CompanyName='$companyname' and OwnerUserName='$username'  ";
-$query1 = mysql_query($sql1);
- if(!mysql_query($sql1)){die('Error :'.mysql_error());}
-while($row1 = mysql_fetch_array($query1))
-{	$bl=$row1['BusLineName'];       					   
-	echo "<option>$bl</option> ";
-} 
-echo' </select> </div>';
-                    
-echo   ' <div class="col-sm-3" >   <input type="submit" name="submit1" value="Find" class="btn btn-danger" ></div>
-                   	   </form>
-					   ';
-
-if (isset($_POST['submit'])) 
-{  ;
-if (empty($_POST['D1'])) 
-   {
-	  ;
-   }
- else
-   {
-$station = filter_input(INPUT_POST, 'D1');
-//$to = filter_input(INPUT_POST, 'D2');
-
-$sql2 = "SELECT DISTINCT * FROM `assigned_to` INNER JOIN  `busline`  on assigned_to.BusNo=busline.BusNo and assigned_to.BusLineName=busline.BusLineName where  CompanyName='$companyname' and OwnerUserName='$username' and BusStationName='$station' ";
-    $query2 = mysql_query($sql2);
-    if(!mysql_query($sql2)){die('Error :'.mysql_error());}
-     while( $row2= mysql_fetch_array($query2)){
-             $busno= $row2['BusNo'];
-             echo $busno , "<br> ";
-	}                                        }
-}
-if (isset($_POST['submit1'])) 
-{ 
-if (empty($_POST['D2'])) 
-   {
-	   
-   }
- else
-   {
-$bl = filter_input(INPUT_POST, 'D2');
-
-$sql3 = "SELECT  * FROM  `busline` where BusLineName='$bl' and  CompanyName='$companyname' and OwnerUserName='$username'   ";
-    $query3 = mysql_query($sql3);
-    if(!mysql_query($sql3)){die('Error :'.mysql_error());}
-     while( $row3= mysql_fetch_array($query3)){
-             $busno= $row3['BusNo'];
-             echo $busno , "<br> ";
-	}                                        }
-}
-					   
-					   
-			   
-echo '		   </div>
-			   </div>
-                           
-</div><div class="col-md-3"></div>
-		 </body>	 
-</html>';	 
-
-
-
-
-?>
-
-<html>
-    
-    
-  
 </html>

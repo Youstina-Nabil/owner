@@ -234,8 +234,8 @@ body {
                   <i class="fa fa-car fa-lg"></i> My Busses <span class="arrow"></span></a>
                 </li>
                 <ul class="sub-menu collapse" id="new">
-                 <a href="ownerhomeupdate.php"> <li>ADD/Remove bus</li>
-                 <a href="busstatus.php"> <li>Bus status and reports </li>
+                 <a href="ownerhomeupdate.php"> <li>Edit my fleet</li>
+                 <a href="busstatuscon.php"> <li>Bus status and reports </li>
                 
                 </ul>
 
@@ -247,9 +247,22 @@ body {
                   <i class="fa fa-users fa-lg"></i> Managers
                   </a>
                 </li>
+                
+                
                  <li>
+                     <a href="ownerhome41.php ">
+                  <i class="fa fa-users fa-lg"></i> Drivers
+                  </a>
+                </li>
+
+				<li>
                   <a href="ownerhome31.php">
                   <i class="glyphicon glyphicon-search"></i> search Busses
+                  </a>
+                  </li>
+				   <li>
+                  <a href="ownerhome51.php">
+                  <i class="glyphicon glyphicon-wrench"></i> commands
                   </a>
                   </li>
             </ul>
